@@ -31,7 +31,7 @@ class ObjectDetection():
         self.VISUAL = VISUAL
         self._cameras = cameras
         self.model_name = model_name
-        self.conf_threshold = 0.4
+        self.conf_threshold = 0.2
         self.nms_threshold = 0.5
         self.object_requested_list = []
         self.distanceMax = 0

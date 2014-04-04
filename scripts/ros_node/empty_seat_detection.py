@@ -29,7 +29,7 @@ class EmptySeatDetection():
 
         self.VISUAL = VISUAL
         self._cameras = cameras
-        self.conf_threshold = 0.6
+        self.conf_threshold = 0.4
         self.chairs_iou = 0.28
         self.pkg_path = get_pkg_path()
         self.objectRequested_list = []
