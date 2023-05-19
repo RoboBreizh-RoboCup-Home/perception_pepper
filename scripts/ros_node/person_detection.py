@@ -54,9 +54,7 @@ class ChairDetection():
 
     def handle_ServicePerceptionHuman(self, seat_detection_service):
         
-        # Create Chair list object
-        seat_list = ObjectList()
-        seat_list.object_list = []
+
         
         time_start = time.time()
         
