@@ -74,14 +74,14 @@ class YOLOV8(Model):
             'classes': 'scripts/models/ObjectDetection/YOLOV8/weights/receptionist/receptionist.txt',
             'input_size': 640,
             },
-            'shoes_socks_320': {
+            'shoes_320': {
             'engine' : inference_engine,
             'model_name': model_name,
             '_conf_threshold': _conf_threshold, 
             '_iou_threshold': _iou_threshold, 
             'type': 'onnx',
-            'model_path': 'scripts/models/ObjectDetection/YOLOV8/weights/shoes/yolov8n_320_shoes_socks.onnx',
-            'classes': 'scripts/models/ObjectDetection/YOLOV8/weights/shoes/shoes_socks.txt',
+            'model_path': 'scripts/models/ObjectDetection/YOLOV8/weights/shoes/shoes_320.onnx',
+            'classes': 'scripts/models/ObjectDetection/YOLOV8/weights/shoes/footwear.txt',
             'input_size': 320,
             },
             'clothes_320': {
