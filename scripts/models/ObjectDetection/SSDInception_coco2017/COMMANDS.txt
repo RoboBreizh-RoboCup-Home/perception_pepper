@@ -1,0 +1,5 @@
+python3 -m tf2onnx.convert --graphdef ./frozen_inference_graph.pb --output ssd_inception_frozen.onnx --opset 12 --inputs image_tensor:0 --outputs num_detections:0,detection_boxes:0,detection_scores:0,detection_classes:0
+
+According to https://github.com/microsoft/onnxruntime/blob/master/docs/Versioning.md:
+
+Opset version should be 12 as we run on onnx 1.4.0 on the robot (for now)

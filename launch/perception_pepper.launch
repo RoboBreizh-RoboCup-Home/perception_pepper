@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- Task parameter -->
+	<arg name="receptionist" default="false" doc="Launch object detection node"/>
+	<arg name="door" default="false" doc="Launch door detection node"/>
+	<arg name="find_my_mates" default="false" doc="Launch door detection node"/>
+	<arg name="restaurant" default="false" doc="Launch door detection node"/>
+	<arg name="gpsr" default="false" doc="Launch gpsr detection node"/>
+	<arg name="store_groceries" default="false" doc="Launch gpsr detection node"/>
+	<arg name="finals" default="false" doc="Launch finals detection node"/>
+	<arg name="test" default="false" doc="Launch tests detection node"/>
+	<arg name="carry_my_luggage" default="false" doc="Launch carry my lugguage detection node"/>
+	<arg name="serve_breakfast" default="false" doc="Launch serve breakfast detection node"/>
+	<arg name="stickler_for_the_rules" default="false" doc="Launch serve stickler for the rules detection node"/>
+	<arg name="clean_the_table" default="false" doc="Launch clean the table detection node"/>
+
+	<!-- Some other parameters -->
+	<arg name="qi_ip" default="127.0.0.1" doc="pepper ip used for qi calls"/>
+
+	<group if="$(arg door)">
+        <node pkg="perception_pepper" type="door_detection_node.py" name="door_detection_node" output="screen" >
+            <param name="MIN_DISTANCE_DOOR" value="0.8"/>
+        </node>
+
+	</group>
+
+	<group if="$(arg find_my_mates)">
+		<node pkg="perception_pepper" type="roboBreizh_detection_node_full.py" name="object_detection_node" output="screen">
+	    		<param name="DESCRIBE_PERSON" value="True" />
+	    		<param name="DETECT_AGE" value="True" />
+	    		<param name="DETECT_COLOR" value="True" />
+	    		<param name="DETECT_DISTANCE" value="True" />
+	    		<param name="DISPLAY_DELAY" value="False" />
+	    		<param name="DISPLAY_ALL_DELAY" value="False" />
+	    		<param name="DISPLAY" value="True" />
+	    		<param name="posture" value="True" />
+	    		<param name="wave" value="True" />
+		  		<param name="simple_person" value="True" />
+	    		<param name="pointing" value="False" />
+		</node>
+	</group>
+
+	<group if="$(arg store_groceries)">
+		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+	</group>
+
+	<group if="$(arg receptionist)">
+		<node pkg="perception_pepper" type="person_features_node.py" name="object_detection_node" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+		<node pkg="perception_pepper" type="empty_seat_detection.py" name="chair_detection_node" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+	</group>
+
+	<group if="$(arg gpsr)">
+		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+	</group>
+
+	<group if="$(arg restaurant)">
+		<node pkg="perception_pepper" type="hand_wave_detection.py" name="hand_waving" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+	</group>
+
+	<group if="$(arg finals)">
+		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+	</group>
+
+	<group if="$(arg carry_my_luggage)">
+		<node pkg="perception_pepper" type="person_tracker_node.py" name="person_tracker" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+		<node pkg="perception_pepper" type="hand_wave_detection.py" name="hand_waving" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+		<node pkg="perception_pepper" type="hand_point_detection.py" name="hand_pointing" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+		<!-- Add bag detection node in order to find the bag -->
+
+	</group>
+
+	<group if="$(arg serve_breakfast)">
+		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+	</group>
+
+	<group if="$(arg clean_the_table)">
+		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+	</group>
+
+	<group if="$(arg stickler_for_the_rules)">
+		<node pkg="perception_pepper" type="shoes_detection_node.py" name="shoes_detection_node" output="screen">
+			<param name="visualize" value="True"/>
+		</node>
+	</group>
+
+	<group if="$(arg test)">
+		<node pkg="perception_pepper" type="roboBreizh_detection_node_full.py" name="object_detection_node_test" output="screen">
+	    		<param name="DESCRIBE_PERSON" value="True" />
+	    		<param name="DETECT_AGE" value="True" />
+	    		<param name="DETECT_COLOR" value="True" />
+	    		<param name="DETECT_DISTANCE" value="True" />
+	    		<param name="DISPLAY_DELAY" value="True" />
+	    		<param name="DISPLAY_ALL_DELAY" value="True" />
+	    		<param name="DISPLAY" value="True" />
+	    		<param name="posture" value="True" />
+	    		<param name="wave" value="True" />
+	    		<param name="pointing" value="False" />
+		</node>
+	</group>
+</launch>
+
+
+
+<!-- <node pkg="perception_pepper" type="roboBreizh_detection_node_full.py" name="object_detection_node" output="screen">
+		<param name="DESCRIBE_PERSON" value="True" />
+		<param name="DETECT_AGE" value="True" />
+		<param name="DETECT_COLOR" value="True" />
+		<param name="DETECT_DISTANCE" value="True" />
+		<param name="DISPLAY_DELAY" value="False" />
+		<param name="DISPLAY_ALL_DELAY" value="False" />
+		<param name="DISPLAY" value="True" />
+		<param name="posture" value="True" />
+		<param name="wave" value="True" />
+		<param name="stickers" value="False" />
+		<param name="pointing" value="False" />
+</node> -->
