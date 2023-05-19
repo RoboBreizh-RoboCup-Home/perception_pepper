@@ -30,7 +30,7 @@ class ShoesDetection():
         
         self.VISUAL = VISUAL
         self._cameras = cameras
-        self.conf_threshold = 0.8
+        self.conf_threshold = 0.7
         self.nms_threshold = 0.5
         self.model_name = model_name
         self.yolo_shoes_detector = YOLOV8(model_name=self.model_name,  _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
@@ -57,12 +57,14 @@ class ShoesDetection():
         detections = self.yolo_shoes_detector.inference(ori_rgb_image_320)
         
         # Create Chair list object
-        shoes_socks_list= ObjectList()
-        shoes_socks_list.object_list = []
+        shoes_list = ObjectList()
+        shoes_list.object_list = []
+        
+        print(detections)
         
         if (len(detections) > 0):
             for i in range(len(detections)):
-                if detections[i]['class_name'] == 'shoes':
+                if detections[i]['class_name'] == 'footwear':
 
                     shoes_start_x = detections[i]['box'][0]
                     shoes_start_y = detections[i]['box'][1]
@@ -78,35 +80,12 @@ class ShoesDetection():
                     shoes.coord.x = point_x
                     shoes.coord.y = point_y
                     shoes.coord.z = point_z
-                    shoes_socks_list.object_list.append(shoes)
+                    shoes_list.object_list.append(shoes)
                     
                     if self.VISUAL:
                         # Display shoes
                         cv2.rectangle(ori_rgb_image_320, (int(shoes_start_x), int(shoes_start_y)) , (int(shoes_end_x), int(shoes_end_y)), (255,0,0), 2)
-                        
-                elif detections[i]['class_name'] == 'socks':
-                    
-                    socks_start_x = detections[i]['box'][0]
-                    socks_start_y = detections[i]['box'][1]
-                    socks_end_x = detections[i]['box'][0] + detections[i]['box'][2]
-                    socks_end_y = detections[i]['box'][1] + detections[i]['box'][3]
-
-                    dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
-                                ori_depth_image, socks_start_x, socks_end_y, socks_start_y, socks_end_x , [ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
-                    
-                    socks = Object()
-                    socks.label = String("socks")
-                    socks.distance = dist
-                    socks.coord.x = point_x
-                    socks.coord.y = point_y
-                    socks.coord.z = point_z
-                    
-                    if self.VISUAL:
-                        # Display shoes
-                        cv2.rectangle(ori_rgb_image_320, (int(shoes_start_x), int(shoes_start_y)) , (int(shoes_end_x), int(shoes_end_y)), (0,0,255), 2)
-                    
-                    shoes_socks_list.object_list.append(socks)
-       
+            
         else:
             rospy.loginfo(
                     bcolors.R+"[RoboBreizh - Vision]        No Shoes Detected. "+bcolors.ENDC)   
@@ -114,7 +93,7 @@ class ShoesDetection():
         if self.VISUAL:
             self.visualiseRVIZ(ori_rgb_image_320)
     
-        return shoes_socks_list
+        return shoes_list
 
 
     def visualiseRVIZ(self, image):
@@ -132,7 +111,7 @@ if __name__ == "__main__":
     qi_ip = rospy.get_param('~qi_ip')
     depth_camera_res = res3D.R320x240
     rgb_camera_res = res2D.R320x240
-    model_name = 'shoes_socks_320'
+    model_name = 'shoes_320'
     
     cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
     ShoesDetection(model_name , cameras, VISUAL)
