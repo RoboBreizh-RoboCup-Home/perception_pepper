@@ -59,9 +59,7 @@ class ShoesDetection():
         # Create Chair list object
         shoes_list = ObjectList()
         shoes_list.object_list = []
-        
-        print(detections)
-        
+                
         if (len(detections) > 0):
             for i in range(len(detections)):
                 if detections[i]['class_name'] == 'footwear':
@@ -86,9 +84,12 @@ class ShoesDetection():
                         # Display shoes
                         cv2.rectangle(ori_rgb_image_320, (int(shoes_start_x), int(shoes_start_y)) , (int(shoes_end_x), int(shoes_end_y)), (255,0,0), 2)
             
+                else:
+                    rospy.loginfo(
+                            bcolors.R+"[RoboBreizh - Vision]        No Shoes Detected. "+bcolors.ENDC) 
         else:
             rospy.loginfo(
-                    bcolors.R+"[RoboBreizh - Vision]        No Shoes Detected. "+bcolors.ENDC)   
+                    bcolors.R+"[RoboBreizh - Vision]        No Objects Detected. "+bcolors.ENDC)   
             
         if self.VISUAL:
             self.visualiseRVIZ(ori_rgb_image_320)

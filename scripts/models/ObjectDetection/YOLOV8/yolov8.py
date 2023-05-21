@@ -80,7 +80,7 @@ class YOLOV8(Model):
             '_conf_threshold': _conf_threshold, 
             '_iou_threshold': _iou_threshold, 
             'type': 'onnx',
-            'model_path': 'scripts/models/ObjectDetection/YOLOV8/weights/shoes/shoes_320.onnx',
+            'model_path': 'scripts/models/ObjectDetection/YOLOV8/weights/shoes/shoes_320v2.onnx',
             'classes': 'scripts/models/ObjectDetection/YOLOV8/weights/shoes/footwear.txt',
             'input_size': 320,
             },
