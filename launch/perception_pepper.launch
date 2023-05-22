@@ -41,39 +41,39 @@
 	</group>
 
 	<group if="$(arg store_groceries)">
-		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection" output="screen">
+		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
 	<group if="$(arg receptionist)">
-		<node pkg="perception_pepper" type="person_features_node.py" name="object_detection_node" output="screen">
+		<node pkg="perception_pepper" type="person_features_node.py" name="person_feature_detection_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
-		<node pkg="perception_pepper" type="empty_seat_detection.py" name="chair_detection_node" output="screen">
+		<node pkg="perception_pepper" type="empty_seat_detection.py" name="seat_detection_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
 	<group if="$(arg gpsr)">
-		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection" output="screen">
+		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
 	<group if="$(arg restaurant)">
-		<node pkg="perception_pepper" type="hand_wave_detection.py" name="hand_waving" output="screen">
+		<node pkg="perception_pepper" type="hand_wave_detection.py" name="hand_waving_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
 	<group if="$(arg finals)">
-		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection" output="screen">
+		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
@@ -84,11 +84,11 @@
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
-		<node pkg="perception_pepper" type="hand_wave_detection.py" name="hand_waving" output="screen">
+		<node pkg="perception_pepper" type="hand_wave_detection.py" name="hand_waving_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
-		<node pkg="perception_pepper" type="hand_point_detection.py" name="hand_pointing" output="screen">
+		<node pkg="perception_pepper" type="hand_point_detection.py" name="hand_pointing_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
@@ -97,14 +97,14 @@
 	</group>
 
 	<group if="$(arg serve_breakfast)">
-		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection" output="screen">
+		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
 	<group if="$(arg clean_the_table)">
-		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection" output="screen">
+		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
@@ -113,6 +113,11 @@
 	<group if="$(arg stickler_for_the_rules)">
 		<node pkg="perception_pepper" type="shoes_detection_node.py" name="shoes_detection_node" output="screen">
 			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+		<node pkg="perception_pepper" type="person_detection.py" name="person_detection_node" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
