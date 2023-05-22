@@ -43,7 +43,7 @@ class PersonTrackerNode():
         self.height = height
         self.pose_model = Movenet(pose_model_name=model_name, width=self.width, height=self.height)
         self._distance_max = 2.5
-        self.person_threshold = 0.3
+        self.person_threshold = 0.5
         if self.VISUAL: 
             self.pub_cv = rospy.Publisher('/roboBreizh_detector/person_tracker_image', Image, queue_size=10)
             self.bridge = CvBridge()
