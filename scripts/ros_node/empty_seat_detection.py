@@ -44,7 +44,7 @@ class EmptySeatDetection():
         self.initObjectDescriptionService()
         
     def initObjectDescriptionService(self):
-        rospy.Service('/robobreizh/perception_pepper/seat_detection',
+        rospy.Service('/robobreizh/perception_pepper/seat_detection_service',
                         seat_detection_service, self.handle_ServicePerceptionObject)
         rospy.loginfo(
             bcolors.O+"[RoboBreizh - Vision]        Starting Empty Seat Detection. "+bcolors.ENDC)
