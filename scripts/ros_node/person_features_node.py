@@ -42,7 +42,7 @@ class PersonFeatureDetection():
         self.age_gender_detector = AgeGender(age_gender_model = age_gender_model)
         self.caffe_age_detector = AgePrediction(age_model_name = cafffe_age_model)
         self.glass_detector = GlassDetection(glass_model_name=glass_model) 
-        self.colour_detector = ColourDetection(colour_csv_file_name = colour_csv)
+        self.colour_detector = ColourDetection(colour_csv_file_name = colour_csv, color_type="hue")
     
         if self.VISUAL: 
             self.bridge = CvBridge()

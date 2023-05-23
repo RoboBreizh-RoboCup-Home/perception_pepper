@@ -9,11 +9,16 @@ import rospy
 
 class ColourDetection():
     
-    def __init__(self, colour_csv_file_name="new_colorsV2.csv"):
+    def __init__(self, colour_csv_file_name="new_colorsV3.csv", color_type="rgb"):
         
         self.pkg_path = get_pkg_path()
         self.newest_csv_path = os.path.join(self.pkg_path, ('scripts/models/ColourDetection/color_csv/' + colour_csv_file_name))
         self.brightness_value = 10
+        self.contrast = 20
+        self.crop_factor = 60
+        self.color_type = color_type
+        rospy.loginfo(
+                bcolors.CYAN+"[RoboBreizh - Vision]    Loading Colour Detection type --" + self.color_type +  "-- done"+bcolors.ENDC)
 
     def change_brightness(self,img, brightness_value):
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -24,6 +29,31 @@ class ColourDetection():
         final_hsv = cv2.merge((h, s, v))
         img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
         return img
+    
+    def apply_brightness_contrast(self,input_img, brightness , contrast):
+    
+        if brightness != 0:
+            if brightness > 0:
+                shadow = brightness
+                highlight = 255
+            else:
+                shadow = 0
+                highlight = 255 + brightness
+            alpha_b = (highlight - shadow)/255
+            gamma_b = shadow
+            
+            buf = cv2.addWeighted(input_img, alpha_b, input_img, 0, gamma_b)
+        else:
+            buf = input_img.copy()
+        
+        if contrast != 0:
+            f = 131*(contrast + 127)/(127*(131-contrast))
+            alpha_c = f
+            gamma_c = 127*(1-f)
+            
+            buf = cv2.addWeighted(buf, alpha_c, buf, 0, gamma_c)
+
+        return buf
 
     def csv_reader(self, datafile, has_header):
         data = []
@@ -79,7 +109,8 @@ class ColourDetection():
 
         if len(cropped) != 0:
             ok, color_res, center_sorted, mapping = self.detect_colors(
-                cropped, num_clusters=3, num_iters=50, resize_factor=color_resize_factor, crop_factor=50, colors_in_order=colors, csv=data, type="rgb", name=str(classe))
+                cropped, num_clusters=3, num_iters=50, resize_factor=color_resize_factor, crop_factor=self.crop_factor, colors_in_order=colors, csv=data, 
+                type=self.color_type, name=str(classe))
         else:
             return 0, '', None, []
         
@@ -95,7 +126,7 @@ class ColourDetection():
             print(bcolors.R + '     detect_color image original EMPTY' + bcolors.WARNING)
             return 0, 0, 0, None
 
-        image = self.change_brightness(image, self.brightness_value)
+        image = self.apply_brightness_contrast(image, self.brightness_value, self.contrast)
         # crop
         height, width, depth = image.shape
         crop_factor = (100 - crop_factor) / 2
@@ -174,7 +205,12 @@ class ColourDetection():
             for x in range(len(centers_sorted)):
                 max_color = centers_sorted[x]
 
-            return centers_sorted[len(centers_sorted) - 1], percentages[len(percentages) - 1]
+            color_array = centers_sorted[len(centers_sorted) - 1], percentages[len(percentages) - 1]
+                        
+            color_res = self.closest(
+                    color_array[0][0], color_array[0][1], color_array[0][2], colors_in_order,csv)  
+                        
+            return 1, color_res, 0 , []
 
         elif (type == "rgb"):
             # define criteria and apply kmeans()
@@ -223,7 +259,7 @@ class ColourDetection():
             print(bcolors.O + '     detect_color image original EMPTY' + bcolors.WARNING)
             return 0, 0, 0
 
-        image = self.change_brightness(image, self.brightness_value)
+        image = self.apply_brightness_contrast(image, self.brightness_value, self.contrast)
         # crop
         height, width, depth = image.shape
         crop_factor = (100 - crop_factor) / 2
