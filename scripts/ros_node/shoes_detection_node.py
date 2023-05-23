@@ -21,6 +21,7 @@ import sys
 from models.ObjectDetection.YOLOV8.yolov8 import YOLOV8
 from perception_utils.bcolors import bcolors
 import perception_utils.distances_utils as distances_utils
+import perception_utils.transform_utils as tf_utils
 from robobreizh_msgs.msg import *
 from robobreizh_msgs.srv import *
 import time
@@ -56,69 +57,65 @@ class ShoesDetection():
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         
         # Detect person
-        person_images = []
-        detections = self.yolo_person_detector.inference(ori_rgb_image_320)
-        if (len(detections)>0):
-            for i in range(len(detections)):
-                if (detections[i]['class_name'] == 'person') :
-                    person_name = detections[i]['class_name']
-                    person_start_x = round(detections[i]['box'][0])
-                    person_end_x = round((detections[i]['box'][0] + detections[i]['box'][2]))
-                    person_start_y = round(detections[i]['box'][1])
-                    person_end_y = round((detections[i]['box'][1] + detections[i]['box'][3])) 
+        # Create Person list
+        person_list = PersonList()
+        person_list.person_list = []
+        person_detections = self.yolo_person_detector.inference(ori_rgb_image_320)
+        if (len(person_detections) > 0):
+            for i in range(len(person_detections)):
+                if (person_detections[i]['class_name'] == 'person'):
+                    person_start_x = round(person_detections[i]['box'][0])
+                    person_end_x = round((person_detections[i]['box'][0] + person_detections[i]['box'][2]))
+                    person_start_y = round(person_detections[i]['box'][1])
+                    person_end_y = round((person_detections[i]['box'][1] + person_detections[i]['box'][3])) 
                                         
                     crop_person = ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :]
-                    person_images.append(crop_person)
+                    # Shoe dectection
+                    shoes_detections = self.yolo_shoes_detector.inference(crop_person)
+                    # print(shoes_detections)
+                    if (len(shoes_detections) > 0):
+                        for j in range(len(shoes_detections)):
+                            if shoes_detections[j]['class_name'] == 'footwear':
+                                
+                                person_dist, person_point_x, person_point_y, person_point_z, _, _ = distances_utils.detectDistanceResolution(
+                                        ori_depth_image, person_start_x, person_end_y, person_start_y, person_end_x, resolutionRGB=ori_rgb_image_320.shape[:2][::-1])
+
+                                person_odom_point = tf_utils.compute_absolute_pose([person_point_x, person_point_y, person_point_z])
+                                
+                                # Create Person object
+                                person = Person()
+                                # Person attributes
+                                person.name.data = f"wear_shoes_no_{i+1}"
+                                person.distance = person_dist
+                                person.coord.x = person_odom_point.x
+                                person.coord.y = person_odom_point.y
+                                person.coord.z = person_odom_point.z
+                                person_list.person_list.append(person)
+                                
+                                if self.VISUAL:
+                                    # Display shoes
+                                    shoes_start_x = shoes_detections[i]['box'][0]
+                                    shoes_start_y = shoes_detections[i]['box'][1]
+                                    shoes_end_x = shoes_detections[i]['box'][0] + shoes_detections[i]['box'][2]
+                                    shoes_end_y = shoes_detections[i]['box'][1] + shoes_detections[i]['box'][3]
+                                    cv2.rectangle(crop_person, 
+                                                  (int(shoes_start_x), int(shoes_start_y)) , (int(shoes_end_x), int(shoes_end_y)), (255,0,0), 2)
+                                    ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :] = crop_person
         
-        
-        # Create Chair list object
-        shoes_list = ObjectList()
-        shoes_list.object_list = []
-        # detections = self.yolo_shoes_detector.inference(ori_rgb_image_320)
-        
-        
-        if len(person_images) == 0:
+        else:
             rospy.loginfo(
                         bcolors.R+"[RoboBreizh - Vision]        No Person Detected. "+bcolors.ENDC) 
-            return shoes_list
+            return person_list
         
-        for person in person_images:
-            detections = self.yolo_shoes_detector.inference(person)
         
-            print(detections)
-            
-            if (len(detections) > 0):
-                for i in range(len(detections)):
-                    if detections[i]['class_name'] == 'footwear':
-
-                        shoes_start_x = detections[i]['box'][0]
-                        shoes_start_y = detections[i]['box'][1]
-                        shoes_end_x = detections[i]['box'][0] + detections[i]['box'][2]
-                        shoes_end_y = detections[i]['box'][1] + detections[i]['box'][3]
-
-                        dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
-                                    ori_depth_image, shoes_start_x, shoes_end_y, shoes_start_y, shoes_end_x , [ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
-                        
-                        shoes = Object()
-                        shoes.label = String("Shoes")
-                        shoes.distance = dist
-                        shoes.coord.x = point_x
-                        shoes.coord.y = point_y
-                        shoes.coord.z = point_z
-                        shoes_list.object_list.append(shoes)
-                        
-                        if self.VISUAL:
-                            # Display shoes
-                            cv2.rectangle(person, (int(shoes_start_x), int(shoes_start_y)) , (int(shoes_end_x), int(shoes_end_y)), (255,0,0), 2)
-                
-            else:
-                rospy.loginfo(
-                        bcolors.R+"[RoboBreizh - Vision]        No Shoes Detected. "+bcolors.ENDC)   
-                
-            if self.VISUAL:
-                self.visualiseRVIZ(person)
+        if len(person_list.person_list) == 0:
+            rospy.loginfo(
+                    bcolors.R+"[RoboBreizh - Vision]        No Shoes Detected. "+bcolors.ENDC)   
+                    
+        if self.VISUAL:
+            self.visualiseRVIZ(ori_rgb_image_320)
     
-        return shoes_list
+        return person_list
 
 
     def visualiseRVIZ(self, image):
