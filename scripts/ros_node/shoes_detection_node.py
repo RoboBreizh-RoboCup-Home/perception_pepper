@@ -30,10 +30,11 @@ class ShoesDetection():
         
         self.VISUAL = VISUAL
         self._cameras = cameras
-        self.conf_threshold = 0.7
+        self.conf_threshold = 0.65
         self.nms_threshold = 0.5
         self.model_name = model_name
         self.yolo_shoes_detector = YOLOV8(model_name=self.model_name,  _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
+        self.yolo_person_detector = YOLOV8(model_name="receptionist_320",  _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
         
         if self.VISUAL: 
             self.bridge = CvBridge()
@@ -53,45 +54,69 @@ class ShoesDetection():
     def handle_ServiceShoesDetection(self, shoes_detection):
         
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
-
-        detections = self.yolo_shoes_detector.inference(ori_rgb_image_320)
+        
+        # Detect person
+        person_images = []
+        detections = self.yolo_person_detector.inference(ori_rgb_image_320)
+        if (len(detections)>0):
+            for i in range(len(detections)):
+                if (detections[i]['class_name'] == 'person') :
+                    person_name = detections[i]['class_name']
+                    person_start_x = round(detections[i]['box'][0])
+                    person_end_x = round((detections[i]['box'][0] + detections[i]['box'][2]))
+                    person_start_y = round(detections[i]['box'][1])
+                    person_end_y = round((detections[i]['box'][1] + detections[i]['box'][3])) 
+                                        
+                    crop_person = ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :]
+                    person_images.append(crop_person)
+        
         
         # Create Chair list object
         shoes_list = ObjectList()
         shoes_list.object_list = []
+        # detections = self.yolo_shoes_detector.inference(ori_rgb_image_320)
         
-        print(detections)
         
-        if (len(detections) > 0):
-            for i in range(len(detections)):
-                if detections[i]['class_name'] == 'footwear':
-
-                    shoes_start_x = detections[i]['box'][0]
-                    shoes_start_y = detections[i]['box'][1]
-                    shoes_end_x = detections[i]['box'][0] + detections[i]['box'][2]
-                    shoes_end_y = detections[i]['box'][1] + detections[i]['box'][3]
-
-                    dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
-                                ori_depth_image, shoes_start_x, shoes_end_y, shoes_start_y, shoes_end_x , [ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
-                    
-                    shoes = Object()
-                    shoes.label = String("Shoes")
-                    shoes.distance = dist
-                    shoes.coord.x = point_x
-                    shoes.coord.y = point_y
-                    shoes.coord.z = point_z
-                    shoes_list.object_list.append(shoes)
-                    
-                    if self.VISUAL:
-                        # Display shoes
-                        cv2.rectangle(ori_rgb_image_320, (int(shoes_start_x), int(shoes_start_y)) , (int(shoes_end_x), int(shoes_end_y)), (255,0,0), 2)
-            
-        else:
+        if len(person_images) == 0:
             rospy.loginfo(
-                    bcolors.R+"[RoboBreizh - Vision]        No Shoes Detected. "+bcolors.ENDC)   
+                        bcolors.R+"[RoboBreizh - Vision]        No Person Detected. "+bcolors.ENDC) 
+            return shoes_list
+        
+        for person in person_images:
+            detections = self.yolo_shoes_detector.inference(person)
+        
+            print(detections)
             
-        if self.VISUAL:
-            self.visualiseRVIZ(ori_rgb_image_320)
+            if (len(detections) > 0):
+                for i in range(len(detections)):
+                    if detections[i]['class_name'] == 'footwear':
+
+                        shoes_start_x = detections[i]['box'][0]
+                        shoes_start_y = detections[i]['box'][1]
+                        shoes_end_x = detections[i]['box'][0] + detections[i]['box'][2]
+                        shoes_end_y = detections[i]['box'][1] + detections[i]['box'][3]
+
+                        dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
+                                    ori_depth_image, shoes_start_x, shoes_end_y, shoes_start_y, shoes_end_x , [ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
+                        
+                        shoes = Object()
+                        shoes.label = String("Shoes")
+                        shoes.distance = dist
+                        shoes.coord.x = point_x
+                        shoes.coord.y = point_y
+                        shoes.coord.z = point_z
+                        shoes_list.object_list.append(shoes)
+                        
+                        if self.VISUAL:
+                            # Display shoes
+                            cv2.rectangle(person, (int(shoes_start_x), int(shoes_start_y)) , (int(shoes_end_x), int(shoes_end_y)), (255,0,0), 2)
+                
+            else:
+                rospy.loginfo(
+                        bcolors.R+"[RoboBreizh - Vision]        No Shoes Detected. "+bcolors.ENDC)   
+                
+            if self.VISUAL:
+                self.visualiseRVIZ(person)
     
         return shoes_list
 
@@ -103,12 +128,14 @@ class ShoesDetection():
     
 
 if __name__ == "__main__":
-
+    print(sys.version)
     rospy.init_node('shoes_detection_node', anonymous=True)
     # VISUAL = True
     # qi_ip ='192.168.50.44'
+    
     VISUAL = rospy.get_param('~visualize')
     qi_ip = rospy.get_param('~qi_ip')
+    
     depth_camera_res = res3D.R320x240
     rgb_camera_res = res2D.R320x240
     model_name = 'shoes_320'
