@@ -13,8 +13,8 @@ class ColourDetection():
         
         self.pkg_path = get_pkg_path()
         self.newest_csv_path = os.path.join(self.pkg_path, ('scripts/models/ColourDetection/color_csv/' + colour_csv_file_name))
-        self.brightness_value = 10
-        self.contrast = 20
+        self.brightness_value = 20
+        self.contrast = 5
         self.crop_factor = 60
         self.color_type = color_type
         rospy.loginfo(
@@ -30,7 +30,10 @@ class ColourDetection():
         img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
         return img
     
-    def apply_brightness_contrast(self,input_img, brightness , contrast):
+    def apply_brightness_contrast(self,input_img):
+        
+        brightness = self.brightness_value
+        contrast = self.contrast
     
         if brightness != 0:
             if brightness > 0:
@@ -85,6 +88,8 @@ class ColourDetection():
         distances = np.sqrt(np.sum((colors_in_order-RGB)**2,axis=1))
         # Get the smallest distance
         index_of_smallest = np.where(distances==np.amin(distances))
+        
+        rospy.loginfo("Closest colour index from CSV" + str(index_of_smallest))
         return csv[int(index_of_smallest[0][0])][1]
     
     def sort_color_by_percentage(self,colors, percentages):
@@ -126,7 +131,7 @@ class ColourDetection():
             print(bcolors.R + '     detect_color image original EMPTY' + bcolors.WARNING)
             return 0, 0, 0, None
 
-        image = self.apply_brightness_contrast(image, self.brightness_value, self.contrast)
+        image = self.apply_brightness_contrast(image)
         # crop
         height, width, depth = image.shape
         crop_factor = (100 - crop_factor) / 2
@@ -259,7 +264,7 @@ class ColourDetection():
             print(bcolors.O + '     detect_color image original EMPTY' + bcolors.WARNING)
             return 0, 0, 0
 
-        image = self.apply_brightness_contrast(image, self.brightness_value, self.contrast)
+        image = self.apply_brightness_contrast(image)
         # crop
         height, width, depth = image.shape
         crop_factor = (100 - crop_factor) / 2
