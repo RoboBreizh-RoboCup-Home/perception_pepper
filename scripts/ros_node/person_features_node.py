@@ -68,8 +68,13 @@ class PersonFeatureDetection():
         
         time_start = time.time()
         # retrieve rgb and depth image from Naoqi camera
-        ori_rgb_image_640, ori_depth_image = self._cameras.get_image(out_format="cv2")
-        ori_rgb_image_320 = cv2.resize(ori_rgb_image_640, (320,240))
+        ori_rgb_image, ori_depth_image = self._cameras.get_image(out_format="cv2")
+        
+        if ori_rgb_image.shape[1] == 640:
+            ori_rgb_image_320 = cv2.resize(ori_rgb_image, (320,240))
+        else:
+            ori_rgb_image_320 = ori_rgb_image
+            
         ori_rgb_image_320 = self.colour_detector.apply_brightness_contrast(ori_rgb_image_320)
         
         # Clothes Detection
