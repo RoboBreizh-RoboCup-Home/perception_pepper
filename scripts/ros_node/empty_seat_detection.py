@@ -13,11 +13,13 @@ import numpy as np
 from models.ObjectDetection.SSDInception_coco2017.ssd_inception_coco import SSDInception
 from perception_utils.bcolors import bcolors
 import perception_utils.distances_utils as distances_utils
+import perception_utils.display_utils as display_utils
 import perception_utils.transform_utils as tf_utils
 from perception_utils.objects_detection_utils import *
 from perception_utils.utils import get_pkg_path
 from robobreizh_msgs.msg import *
 from robobreizh_msgs.srv import *
+from visualization_msgs.msg import MarkerArray
 import tf2_ros
 import time
 
@@ -40,6 +42,8 @@ class EmptySeatDetection():
         if self.VISUAL: 
             self.bridge = CvBridge()
             self.pub_opencv = rospy.Publisher('/roboBreizh_detector/empty_seat_detection', Image, queue_size=10)
+            self.marker_arr_pub = rospy.Publisher(
+                '/roboBreizh_detector/visualization_marker_array', MarkerArray, queue_size=1)
                     
         self.initObjectDescriptionService()
         
@@ -118,8 +122,11 @@ class EmptySeatDetection():
                     obj.distance = float(dist)
                     obj.height_img = bottom-top  # for Rviz scaling
                     obj.width_img = right-left
-
                     seat_list.object_list.append(obj)
+                    
+                    if self.VISUAL:  
+                        display_utils.show_RViz_marker_arr(self.marker_arr_pub, seat_list, DURATION=50)
+                    
                 else:
                     rospy.loginfo(
                         bcolors.R+"[RoboBreizh - Vision]        Seats Detected but not within range. "+bcolors.ENDC)   
@@ -137,11 +144,11 @@ if __name__ == "__main__":
     
     rospy.init_node('seat_detection_node', anonymous=True)
 
-    VISUAL = rospy.get_param('~visualize')
-    qi_ip = rospy.get_param('~qi_ip')
+    # VISUAL = rospy.get_param('~visualize')
+    # qi_ip = rospy.get_param('~qi_ip')
     
-    # VISUAL = True
-    # qi_ip = "192.168.50.44"
+    VISUAL = True
+    qi_ip = "192.168.50.44"
         
     depth_camera_res = res3D.R320x240
     rgb_camera_res = res2D.R320x240
