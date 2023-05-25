@@ -93,6 +93,16 @@ class YOLOV8(Model):
             'model_path': 'scripts/models/ObjectDetection/YOLOV8/weights/clothes/clothes_320.onnx',
             'classes': 'scripts/models/ObjectDetection/YOLOV8/weights/clothes/clothes.txt',
             'input_size': 320,
+            },
+            'drink_320': {
+            'engine' : inference_engine,
+            'model_name': model_name,
+            '_conf_threshold': _conf_threshold, 
+            '_iou_threshold': _iou_threshold, 
+            'type': 'onnx',
+            'model_path': 'scripts/models/ObjectDetection/YOLOV8/weights/drink/drink_320.onnx',
+            'classes': 'scripts/models/ObjectDetection/YOLOV8/weights/drink/drink.txt',
+            'input_size': 320,
             }            
         }
 
