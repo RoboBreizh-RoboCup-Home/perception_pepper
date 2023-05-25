@@ -104,10 +104,10 @@ class EmptySeatDetection():
                 bottom = chair.xyxy[2]
                 right = chair.xyxy[3]
                 dist, point_x, point_y, point_z, Xcenter, Ycenter = distances_utils.detectDistanceResolution(
-                    ori_depth_image, left, bottom, top, right, [640, 480])
+                    ori_depth_image, left, bottom, top, right, resolutionRGB=[ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
                 
                 odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
-
+                                
                 if dist <= self.distanceMax:
                     ############## store for MANAGER ##############
                     obj = Object()
