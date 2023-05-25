@@ -115,7 +115,7 @@ class EmptySeatDetection():
                 if dist <= self.distanceMax:
                     ############## store for MANAGER ##############
                     obj = Object()
-                    obj.label.data = "Empty Seat"
+                    obj.label.data = "seat"
                     obj.coord.x = odom_point.x
                     obj.coord.y = odom_point.y
                     obj.coord.z = odom_point.z
