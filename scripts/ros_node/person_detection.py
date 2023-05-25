@@ -23,7 +23,7 @@ from robobreizh_msgs.srv import *
 import tf2_ros
 import time
 
-class ChairDetection():
+class PersonDetection():
         
     def __init__(self , model_name, cameras: nc.NaoqiCameras, VISUAL) -> None:
         
@@ -128,4 +128,4 @@ if __name__ == "__main__":
     rgb_camera_res = res2D.R320x240
  
     cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
-    ChairDetection("receptionist_320", cameras, VISUAL)
+    PersonDetection("receptionist_320", cameras, VISUAL)
