@@ -63,6 +63,10 @@
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
+		<node pkg="perception_pepper" type="person_features_node.py" name="person_feature_detection_node" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
 	</group>
 
 	<group if="$(arg restaurant)">
