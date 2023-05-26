@@ -43,7 +43,7 @@ class ObjectDetection():
         
         if self.VISUAL: 
             self.bridge = CvBridge()
-            self.pub_opencv = rospy.Publisher('/roboBreizh_detector/object_detection_raw_image', Image, queue_size=10)
+            # self.pub_opencv = rospy.Publisher('/roboBreizh_detector/object_detection_raw_image', Image, queue_size=10)
             self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/object_detection_compressed_image",
             CompressedImage)
         
@@ -143,8 +143,8 @@ class ObjectDetection():
     
     def visualiseRVIZ(self, chair_image):
         
-        cv_chair_image = self.bridge.cv2_to_imgmsg(chair_image, "bgr8")
-        self.pub_opencv.publish(cv_chair_image) 
+        # cv_chair_image = self.bridge.cv2_to_imgmsg(chair_image, "bgr8")
+        # self.pub_opencv.publish(cv_chair_image) 
         
         #### Create CompressedIamge ####
         msg = CompressedImage()
