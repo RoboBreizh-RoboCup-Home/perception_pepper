@@ -43,7 +43,7 @@ class ObjectDetection():
         
         if self.VISUAL: 
             self.bridge = CvBridge()
-            self.pub_opencv = rospy.Publisher('/roboBreizh_detector/object_detection_raw_image', Image, queue_size=10)
+            # self.pub_opencv = rospy.Publisher('/roboBreizh_detector/object_detection_raw_image', Image, queue_size=10)
             self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/object_detection_compressed_image",
             CompressedImage,  queue_size=10)
         
@@ -141,16 +141,16 @@ class ObjectDetection():
         
         return obj_list
     
-    def visualiseRVIZ(self, ros_image):
+    def visualiseRVIZ(self, cv_image):
         
-        cv_image = self.bridge.cv2_to_imgmsg(ros_image, "bgr8")
-        self.pub_opencv.publish(cv_image) 
+        # ros_image = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
+        # self.pub_opencv.publish(ros_image) 
         
         #### Create CompressedIamge ####
         msg = CompressedImage()
         msg.header.stamp = rospy.Time.now()
         msg.format = "jpeg"
-        msg.data = np.array(cv2.imencode('.jpg', ros_image)[1]).tobytes()
+        msg.data = np.array(cv2.imencode('.jpg', cv_image)[1]).tostring()
         # Publish new image
         self.pub_compressed_img.publish(msg)
 
