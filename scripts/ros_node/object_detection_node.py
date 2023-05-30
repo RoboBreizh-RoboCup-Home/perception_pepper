@@ -31,7 +31,7 @@ class ObjectDetection():
         self.VISUAL = VISUAL
         self._cameras = cameras
         self.model_name = model_name
-        self.conf_threshold = 0.6
+        self.conf_threshold = 0.3
         self.nms_threshold = 0.5
         self.object_requested_list = []
         self.distanceMax = 0
@@ -43,9 +43,9 @@ class ObjectDetection():
         
         if self.VISUAL: 
             self.bridge = CvBridge()
-            self.pub_opencv = rospy.Publisher('/roboBreizh_detector/object_detection_raw_image', Image, queue_size=10)
+            # self.pub_opencv = rospy.Publisher('/roboBreizh_detector/object_detection_raw_image', Image, queue_size=10)
             self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/object_detection_compressed_image",
-            CompressedImage)
+            CompressedImage,  queue_size=10)
         
         self.initObjectDescriptionService()
         
@@ -141,16 +141,16 @@ class ObjectDetection():
         
         return obj_list
     
-    def visualiseRVIZ(self, chair_image):
+    def visualiseRVIZ(self, cv_image):
         
-        cv_chair_image = self.bridge.cv2_to_imgmsg(chair_image, "bgr8")
-        self.pub_opencv.publish(cv_chair_image) 
+        # ros_image = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
+        # self.pub_opencv.publish(ros_image) 
         
         #### Create CompressedIamge ####
         msg = CompressedImage()
         msg.header.stamp = rospy.Time.now()
         msg.format = "jpeg"
-        msg.data = np.array(cv2.imencode('.jpg', chair_image)[1]).tostring()
+        msg.data = np.array(cv2.imencode('.jpg', cv_image)[1]).tostring()
         # Publish new image
         self.pub_compressed_img.publish(msg)
 
