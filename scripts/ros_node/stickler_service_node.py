@@ -122,7 +122,7 @@ class RuleStickler():
         
         else:
             rospy.loginfo(
-                        bcolors.R+"[RoboBreizh - Vision]        No Person Detected. "+bcolors.ENDC) 
+                bcolors.R+"[RoboBreizh - Vision]        No Person Detected. "+bcolors.ENDC) 
             return person_list
             
                     
@@ -155,7 +155,7 @@ class RuleStickler():
                                 ori_depth_image, 
                                 start_x + person_coord[0], end_y + person_coord[1], 
                                 start_y + person_coord[2], end_x + person_coord[3], 
-                                resolutionRGB=ori_rgb_image.shape[:2])
+                                resolutionRGB=ori_rgb_image.shape[:2][::-1])
                         
                         odom_point = tf_utils.compute_absolute_pose([point_x, point_y, point_z])  
                         # drink attribute
@@ -166,7 +166,7 @@ class RuleStickler():
                         return_dict["drink_info"].coord.z = odom_point.z
                         
                     if self.VISUAL:
-                        # Display shoes
+                        # Display detection results
                         start_x = detections[i]['box'][0]
                         start_y = detections[i]['box'][1]
                         end_x = detections[i]['box'][0] + detections[i]['box'][2]
@@ -180,7 +180,7 @@ class RuleStickler():
 
 if __name__ == "__main__":
     print(sys.version)
-    rospy.init_node('shoes_detection_node', anonymous=True)
+    rospy.init_node('rule_stickler_node', anonymous=True)
     # VISUAL = True
     # qi_ip ='192.168.50.44'
     

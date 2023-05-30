@@ -74,7 +74,7 @@ class BagDetection():
                                 
                     # Distance Detection
                     dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
-                            ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=[ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
+                            ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=ori_rgb_image_320.shape[:2][::-1])
                     
                     odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
 

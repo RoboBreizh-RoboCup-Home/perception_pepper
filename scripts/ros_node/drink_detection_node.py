@@ -22,7 +22,7 @@ from models.ObjectDetection.YOLOV8.yolov8 import YOLOV8
 from perception_utils.bcolors import bcolors
 import perception_utils.distances_utils as distances_utils
 import perception_utils.transform_utils as tf_utils
-from robobreizh_msgs.msg import Person, PersonList
+from robobreizh_msgs.msg import Object, ObjectList
 from robobreizh_msgs.srv import drink_detection
 import time
 
@@ -33,9 +33,9 @@ class DrinkDetection():
         self._cameras = cameras
         self.conf_threshold = 0.3
         self.nms_threshold = 0.5
+        self.distanceMax = 0
         self.model_name = model_name
         self.yolo_drink_detector = YOLOV8(model_name=self.model_name,  _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
-        self.yolo_person_detector = YOLOV8(model_name="receptionist_320",  _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
         
         if self.VISUAL: 
             self.bridge = CvBridge()
@@ -56,64 +56,61 @@ class DrinkDetection():
         
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         
-        # Detect person
-        # Create Person list
-        person_list = PersonList()
-        person_list.person_list = []
-        person_detections = self.yolo_person_detector.inference(ori_rgb_image_320)
+        self.distanceMax = drink_detection.entries_list.distanceMaximum
+        obj_list= ObjectList()
+        obj_list.object_list = []
         
-        if (len(person_detections) > 0):
-            for i in range(len(person_detections)):
-                if (person_detections[i]['class_name'] == 'person'):
-                    person_start_x = round(person_detections[i]['box'][0])
-                    person_end_x = round((person_detections[i]['box'][0] + person_detections[i]['box'][2]))
-                    person_start_y = round(person_detections[i]['box'][1])
-                    person_end_y = round((person_detections[i]['box'][1] + person_detections[i]['box'][3])) 
-                                        
-                    crop_person = ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :]
-                    # Shoe dectection
-                    drink_detections = self.yolo_drink_detector.inference(crop_person)
-                    print(drink_detections)
-                    if (len(drink_detections) > 0):
-                        for j in range(len(drink_detections)):
-                            if drink_detections[j]['class_name'] == 'drink':
+        time_start = time.time()
+        
+        ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
+        
+        detections = self.yolo_drink_detector.inference(ori_rgb_image_320)
+        if (len(detections) > 0):
+            for i in range(len(detections)):
+                object_name = detections[i]['class_name']
+                if object_name == 'drink':
+                    start_x = round(detections[i]['box'][0])
+                    end_x = round((detections[i]['box'][0] + detections[i]['box'][2]))
+                    start_y = round(detections[i]['box'][1])
+                    end_y = round((detections[i]['box'][1] + detections[i]['box'][3]))
                                 
-                                person_dist, person_point_x, person_point_y, person_point_z, _, _ = distances_utils.detectDistanceResolution(
-                                        ori_depth_image, person_start_x, person_end_y, person_start_y, person_end_x, resolutionRGB=ori_rgb_image_320.shape[:2][::-1])
+                    # Distance Detection
+                    dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
+                            ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=ori_rgb_image_320.shape[:2][::-1])
+                    
+                    odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
 
-                                person_odom_point = tf_utils.compute_absolute_pose([person_point_x, person_point_y, person_point_z])
-                                
-                                # Create Person object
-                                person = Person()
-                                # Person attributes
-                                person.name.data = f"hold_drink_no_{i+1}"
-                                person.distance = person_dist
-                                person.coord.x = person_odom_point.x
-                                person.coord.y = person_odom_point.y
-                                person.coord.z = person_odom_point.z
-                                person_list.person_list.append(person)
-                                
-                                if self.VISUAL:
-                                    # Display drink
-                                    drink_start_x = drink_detections[j]['box'][0]
-                                    drink_start_y = drink_detections[j]['box'][1]
-                                    drink_end_x = drink_detections[j]['box'][0] + drink_detections[j]['box'][2]
-                                    drink_end_y = drink_detections[j]['box'][1] + drink_detections[j]['box'][3]
-                                    cv2.rectangle(crop_person, 
-                                                  (int(drink_start_x), int(drink_start_y)) , (int(drink_end_x), int(drink_end_y)), (255,0,0), 2)
-                                    ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :] = crop_person
-                    else:
+                    time_end = time.time()
+                    rospy.loginfo("Total time inference: " + str(time_end-time_start))
+                    
+                    if dist > self.distanceMax:
                         rospy.loginfo(
-                            bcolors.R+"[RoboBreizh - Vision]        No Drink Detected. "+bcolors.ENDC)             
+                            bcolors.R+"[RoboBreizh - Vision]        Drink Detected but not within range. "+bcolors.ENDC)
+                        continue
+                    
+                    if self.VISUAL:
+                        cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), (255,255,0), 0)
+
+                    obj = Object()
+                        
+                    # Chair attributes
+                    obj.label = String(object_name)
+                    obj.distance = dist
+                    obj.coord.x = odom_point.x
+                    obj.coord.y = odom_point.y
+                    obj.coord.z = odom_point.z
+                    
+                    obj_list.object_list.append(obj)
+                    
         else:
             rospy.loginfo(
-                        bcolors.R+"[RoboBreizh - Vision]        No Objects Detected. "+bcolors.ENDC) 
-            return person_list
-  
+                    bcolors.R+"[RoboBreizh - Vision]        No Drink Detected. "+bcolors.ENDC)  
+        
+                    
         if self.VISUAL:
             self.visualiseRVIZ(ori_rgb_image_320)
     
-        return person_list
+        return obj_list
 
 
     def visualiseRVIZ(self, image):
