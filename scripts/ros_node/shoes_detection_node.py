@@ -94,10 +94,10 @@ class ShoesDetection():
                                 
                                 if self.VISUAL:
                                     # Display shoes
-                                    shoes_start_x = shoes_detections[i]['box'][0]
-                                    shoes_start_y = shoes_detections[i]['box'][1]
-                                    shoes_end_x = shoes_detections[i]['box'][0] + shoes_detections[i]['box'][2]
-                                    shoes_end_y = shoes_detections[i]['box'][1] + shoes_detections[i]['box'][3]
+                                    shoes_start_x = shoes_detections[j]['box'][0]
+                                    shoes_start_y = shoes_detections[j]['box'][1]
+                                    shoes_end_x = shoes_detections[j]['box'][0] + shoes_detections[j]['box'][2]
+                                    shoes_end_y = shoes_detections[j]['box'][1] + shoes_detections[j]['box'][3]
                                     cv2.rectangle(crop_person, 
                                                   (int(shoes_start_x), int(shoes_start_y)) , (int(shoes_end_x), int(shoes_end_y)), (255,0,0), 2)
                                     ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :] = crop_person

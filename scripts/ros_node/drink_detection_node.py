@@ -94,10 +94,10 @@ class DrinkDetection():
                                 
                                 if self.VISUAL:
                                     # Display drink
-                                    drink_start_x = drink_detections[i]['box'][0]
-                                    drink_start_y = drink_detections[i]['box'][1]
-                                    drink_end_x = drink_detections[i]['box'][0] + drink_detections[i]['box'][2]
-                                    drink_end_y = drink_detections[i]['box'][1] + drink_detections[i]['box'][3]
+                                    drink_start_x = drink_detections[j]['box'][0]
+                                    drink_start_y = drink_detections[j]['box'][1]
+                                    drink_end_x = drink_detections[j]['box'][0] + drink_detections[j]['box'][2]
+                                    drink_end_y = drink_detections[j]['box'][1] + drink_detections[j]['box'][3]
                                     cv2.rectangle(crop_person, 
                                                   (int(drink_start_x), int(drink_start_y)) , (int(drink_end_x), int(drink_end_y)), (255,0,0), 2)
                                     ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :] = crop_person
