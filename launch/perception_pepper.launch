@@ -13,6 +13,7 @@
 	<arg name="serve_breakfast" default="false" doc="Launch serve breakfast detection node"/>
 	<arg name="stickler_for_the_rules" default="false" doc="Launch serve stickler for the rules detection node"/>
 	<arg name="clean_the_table" default="false" doc="Launch clean the table detection node"/>
+	<arg name="visualize" default="false" doc="visual elements topics trigger"/>
 
 	<!-- Some other parameters -->
 	<arg name="qi_ip" default="127.0.0.1" doc="pepper ip used for qi calls"/>
@@ -42,64 +43,64 @@
 
 	<group if="$(arg store_groceries)">
 		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
 	<group if="$(arg receptionist)">
 		<node pkg="perception_pepper" type="person_features_node.py" name="person_feature_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 
 		<node pkg="perception_pepper" type="person_detection.py" name="person_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 
 		<node pkg="perception_pepper" type="empty_seat_detection.py" name="seat_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
 	<group if="$(arg gpsr)">
 		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 		<node pkg="perception_pepper" type="person_features_node.py" name="person_feature_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
 	<group if="$(arg restaurant)">
 		<node pkg="perception_pepper" type="hand_wave_detection.py" name="hand_waving_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
 	<group if="$(arg finals)">
 		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
 	<group if="$(arg carry_my_luggage)">
 		<node pkg="perception_pepper" type="person_tracker_node.py" name="person_tracker" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 		<node pkg="perception_pepper" type="hand_wave_detection.py" name="hand_waving_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 		<node pkg="perception_pepper" type="hand_point_detection.py" name="hand_pointing_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 		<!-- Add bag detection node in order to find the bag -->
@@ -112,14 +113,14 @@
 
 	<group if="$(arg serve_breakfast)">
 		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
 
 	<group if="$(arg clean_the_table)">
 		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
