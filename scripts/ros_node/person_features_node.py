@@ -42,7 +42,7 @@ class PersonFeatureDetection():
         self.age_gender_detector = AgeGender(age_gender_model = age_gender_model)
         self.caffe_age_detector = AgePrediction(age_model_name = cafffe_age_model)
         self.glass_detector = GlassDetection(glass_model_name=glass_model) 
-        self.colour_detector = ColourDetection(colour_csv_file_name = colour_csv)
+        self.colour_detector = ColourDetection(colour_csv_file_name = colour_csv, color_type="hue")
     
         if self.VISUAL: 
             self.bridge = CvBridge()
@@ -68,8 +68,15 @@ class PersonFeatureDetection():
         
         time_start = time.time()
         # retrieve rgb and depth image from Naoqi camera
-        ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
-                
+        ori_rgb_image, ori_depth_image = self._cameras.get_image(out_format="cv2")
+        
+        if ori_rgb_image.shape[1] == 640:
+            ori_rgb_image_320 = cv2.resize(ori_rgb_image, (320,240))
+        else:
+            ori_rgb_image_320 = ori_rgb_image
+            
+        ori_rgb_image_320 = self.colour_detector.apply_brightness_contrast(ori_rgb_image_320)
+        
         # Clothes Detection
         detections = self.yolo_clothes_detector.inference(ori_rgb_image_320)
 
@@ -165,7 +172,7 @@ if __name__ == "__main__":
     qi_ip = rospy.get_param('~qi_ip')
     
     depth_camera_res = res3D.R320x240
-    rgb_camera_res = res2D.R320x240
+    rgb_camera_res = res2D.R640x480
 
     cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
     PersonFeatureDetection(yolo_model="clothes_320", 
@@ -173,5 +180,5 @@ if __name__ == "__main__":
                            cafffe_age_model= "age_net.caffemodel",
                            age_gender_model = "AgeGenderTFlite", 
                            glass_model = "shape_predictor_5_face_landmarks.dat", 
-                           colour_csv = "new_colorsV2.csv", 
+                           colour_csv = "new_colorsV3.csv", 
                            cameras=cameras, VISUAL=VISUAL)

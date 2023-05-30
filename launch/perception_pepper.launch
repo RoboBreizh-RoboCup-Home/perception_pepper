@@ -52,6 +52,12 @@
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
+
+		<node pkg="perception_pepper" type="person_detection.py" name="person_detection_node" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+
 		<node pkg="perception_pepper" type="empty_seat_detection.py" name="seat_detection_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
@@ -60,6 +66,10 @@
 
 	<group if="$(arg gpsr)">
 		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
+			<param name="visualize" value="True"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
+		<node pkg="perception_pepper" type="person_features_node.py" name="person_feature_detection_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
@@ -122,7 +132,7 @@
 		<node pkg="perception_pepper" type="bag_detection_node.py" name="bag_detection_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
-		</node>
+		</node> 
 		<node pkg="perception_pepper" type="person_detection.py" name="person_detection_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>

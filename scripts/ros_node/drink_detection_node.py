@@ -23,7 +23,7 @@ from perception_utils.bcolors import bcolors
 import perception_utils.distances_utils as distances_utils
 import perception_utils.transform_utils as tf_utils
 from robobreizh_msgs.msg import Person, PersonList
-from robobreizh_msgs.srv import shoes_detection
+from robobreizh_msgs.srv import drink_detection
 import time
 
 class DrinkDetection():
@@ -31,7 +31,7 @@ class DrinkDetection():
         
         self.VISUAL = VISUAL
         self._cameras = cameras
-        self.conf_threshold = 0.65
+        self.conf_threshold = 0.3
         self.nms_threshold = 0.5
         self.model_name = model_name
         self.yolo_drink_detector = YOLOV8(model_name=self.model_name,  _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
@@ -46,7 +46,7 @@ class DrinkDetection():
 
     def init_service(self):
         rospy.Service('/robobreizh/perception_pepper/drink_detection',
-                        shoes_detection, self.handle_service)
+                        drink_detection, self.handle_service)
         rospy.loginfo(
             bcolors.O+"[RoboBreizh - Vision]        Starting Drink Detection. "+bcolors.ENDC)
         
@@ -61,6 +61,7 @@ class DrinkDetection():
         person_list = PersonList()
         person_list.person_list = []
         person_detections = self.yolo_person_detector.inference(ori_rgb_image_320)
+        
         if (len(person_detections) > 0):
             for i in range(len(person_detections)):
                 if (person_detections[i]['class_name'] == 'person'):
@@ -72,7 +73,7 @@ class DrinkDetection():
                     crop_person = ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :]
                     # Shoe dectection
                     drink_detections = self.yolo_drink_detector.inference(crop_person)
-                    # print(drink_detections)
+                    print(drink_detections)
                     if (len(drink_detections) > 0):
                         for j in range(len(drink_detections)):
                             if drink_detections[j]['class_name'] == 'drink':
@@ -101,17 +102,14 @@ class DrinkDetection():
                                     cv2.rectangle(crop_person, 
                                                   (int(drink_start_x), int(drink_start_y)) , (int(drink_end_x), int(drink_end_y)), (255,0,0), 2)
                                     ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :] = crop_person
-        
+                    else:
+                        rospy.loginfo(
+                            bcolors.R+"[RoboBreizh - Vision]        No Drink Detected. "+bcolors.ENDC)             
         else:
             rospy.loginfo(
-                        bcolors.R+"[RoboBreizh - Vision]        No Person Detected. "+bcolors.ENDC) 
+                        bcolors.R+"[RoboBreizh - Vision]        No Objects Detected. "+bcolors.ENDC) 
             return person_list
-        
-        
-        if len(person_list.person_list) == 0:
-            rospy.loginfo(
-                    bcolors.R+"[RoboBreizh - Vision]        No Drink Detected. "+bcolors.ENDC)   
-                    
+  
         if self.VISUAL:
             self.visualiseRVIZ(ori_rgb_image_320)
     
@@ -125,17 +123,17 @@ class DrinkDetection():
     
 
 if __name__ == "__main__":
-    print(sys.version)
-    rospy.init_node('drink_detection_node', anonymous=True)
-    # VISUAL = True
-    # qi_ip ='192.168.50.44'
     
-    VISUAL = rospy.get_param('~visualize')
-    qi_ip = rospy.get_param('~qi_ip')
+    rospy.init_node('drink_detection_node', anonymous=True)
+    VISUAL = True
+    qi_ip ='192.168.50.44'
+    
+    # VISUAL = rospy.get_param('~visualize')
+    # qi_ip = rospy.get_param('~qi_ip')
     
     depth_camera_res = res3D.R320x240
     rgb_camera_res = res2D.R320x240
-    model_name = 'drink_320'
+    model_name = 'drinks_320'
     
     cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
     DrinkDetection(model_name , cameras, VISUAL)
