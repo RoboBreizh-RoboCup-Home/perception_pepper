@@ -38,16 +38,17 @@ class RuleStickler():
         self._cameras = cameras
         self.distanceMax = 0
         self.conf_threshold = 0.65
+        self.drink_threshold = 0.3
         self.nms_threshold = 0.5
         self.yolo_person_detector = YOLOV8(model_name=person_model, _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
         self.yolo_shoes_detector = YOLOV8(model_name=shoes_model, _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
-        self.yolo_drink_detector = YOLOV8(model_name=drink_model, _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
+        self.yolo_drink_detector = YOLOV8(model_name=drink_model, _conf_threshold=self.drink_threshold, _iou_threshold=self.nms_threshold)
         
         if self.VISUAL: 
             self.bridge = CvBridge()
             self.pub_cv = rospy.Publisher('/roboBreizh_detector/stickler_detection_image', Image, queue_size=10)
         
-        self.initShoesDetectionService()
+        self.init_service()
         rospy.spin()
 
     def init_service(self):
@@ -149,6 +150,10 @@ class RuleStickler():
                 object_name = detections[i]['class_name']
                 if object_name in detected_classes:
                     return_dict["is_detected"] = True
+                    start_x = detections[i]['box'][0]
+                    start_y = detections[i]['box'][1]
+                    end_x = detections[i]['box'][0] + detections[i]['box'][2]
+                    end_y = detections[i]['box'][1] + detections[i]['box'][3]
                     
                     if person_coord:
                         dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
@@ -167,10 +172,6 @@ class RuleStickler():
                         
                     if self.VISUAL:
                         # Display detection results
-                        start_x = detections[i]['box'][0]
-                        start_y = detections[i]['box'][1]
-                        end_x = detections[i]['box'][0] + detections[i]['box'][2]
-                        end_y = detections[i]['box'][1] + detections[i]['box'][3]
                         cv2.rectangle(draw_image, 
                                       (int(start_x), int(start_y)) , (int(end_x), int(end_y)), (255,0,0), 2)
         
@@ -191,7 +192,7 @@ if __name__ == "__main__":
     rgb_camera_res = res2D.R320x240
     person_model_name = 'receptionist_320'
     shoes_model_name = 'shoes_320'
-    drink_model_name = 'drink_320'
+    drink_model_name = 'drinks_320'
     
     cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
     RuleStickler(person_model_name, shoes_model_name, drink_model_name , cameras, VISUAL)
