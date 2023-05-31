@@ -29,7 +29,7 @@ class EmptySeatDetection():
         
         self.VISUAL = VISUAL
         self._cameras = cameras
-        self.conf_threshold = 0.4
+        self.conf_threshold = 0.5
         self.pkg_path = get_pkg_path()
         self.objectRequested_list = []
         self.distanceMax = 0
@@ -84,7 +84,7 @@ class EmptySeatDetection():
                     
         ori_rgb_image_320, arr_persons, arr_empty_chairs, arr_taken_chairs = has_chairs_coco_couch(ori_rgb_image_320,
                 self.coco_class_list, outputs_coco, ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0])
-        
+                
         if len(arr_empty_chairs)>1:
             for i in range(len(arr_empty_chairs)):
                 for j in range(i+1, len(arr_empty_chairs)):
@@ -126,12 +126,13 @@ class EmptySeatDetection():
                     
                     if self.VISUAL:  
                         display_utils.show_RViz_marker_arr(self.marker_arr_pub, seat_list, DURATION=50)
-                        self.visualiseRVIZ(ori_rgb_image_320)
                     
                 else:
                     rospy.loginfo(
                         bcolors.R+"[RoboBreizh - Vision]        Seats Detected but not within range. "+bcolors.ENDC)   
         
+        self.visualiseRVIZ(ori_rgb_image_320)
+
         
         return seat_list
         
