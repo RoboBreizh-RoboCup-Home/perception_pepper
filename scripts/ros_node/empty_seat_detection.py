@@ -29,7 +29,8 @@ class EmptySeatDetection():
         
         self.VISUAL = VISUAL
         self._cameras = cameras
-        self.conf_threshold = 0.5
+        self.conf_threshold = 0.4
+        self.chairs_iou = 0.28
         self.pkg_path = get_pkg_path()
         self.objectRequested_list = []
         self.distanceMax = 0
@@ -84,12 +85,12 @@ class EmptySeatDetection():
                     
         ori_rgb_image_320, arr_persons, arr_empty_chairs, arr_taken_chairs = has_chairs_coco_couch(ori_rgb_image_320,
                 self.coco_class_list, outputs_coco, ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0])
-                
+        
         if len(arr_empty_chairs)>1:
             for i in range(len(arr_empty_chairs)):
                 for j in range(i+1, len(arr_empty_chairs)):
                     iou = (intersection_over_union(arr_empty_chairs[i].xyxy, arr_empty_chairs[j].xyxy))
-                    if iou > 0.5:
+                    if iou > self.chairs_iou:
                         del arr_empty_chairs[i]
                     
         # ------------------ TIMING  ------------------------------
