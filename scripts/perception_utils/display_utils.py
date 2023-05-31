@@ -114,7 +114,7 @@ def create_obj_marker( obj:Object, id:int, DURATION:int):
     """
     # Get Obj Info
     obj_coord:Point32 = obj.coord  # is Point32() on odom frame
-    od_to_cam_tf = transform_utils.get_transformation("CameraTop_optical_frame", "odom")
+    od_to_cam_tf = transform_utils.get_transformation("CameraTop_optical_frame", "base_link")
     cam_pose = transform_utils.transform_point(od_to_cam_tf, obj_coord)
     cam_dist = cam_pose.z  # cam optical frame z
     bbx_width = obj.width_img

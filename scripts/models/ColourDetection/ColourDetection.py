@@ -13,7 +13,7 @@ class ColourDetection():
         
         self.pkg_path = get_pkg_path()
         self.newest_csv_path = os.path.join(self.pkg_path, ('scripts/models/ColourDetection/color_csv/' + colour_csv_file_name))
-        self.brightness_value = 20
+        self.brightness_value = 5
         self.contrast = 5
         self.crop_factor = 60
         self.color_type = color_type
