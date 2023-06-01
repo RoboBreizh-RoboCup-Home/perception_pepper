@@ -30,6 +30,7 @@ class EmptySeatDetection():
         self.VISUAL = VISUAL
         self._cameras = cameras
         self.conf_threshold = 0.4
+        self.chairs_iou = 0.28
         self.pkg_path = get_pkg_path()
         self.objectRequested_list = []
         self.distanceMax = 0
@@ -89,7 +90,7 @@ class EmptySeatDetection():
             for i in range(len(arr_empty_chairs)):
                 for j in range(i+1, len(arr_empty_chairs)):
                     iou = (intersection_over_union(arr_empty_chairs[i].xyxy, arr_empty_chairs[j].xyxy))
-                    if iou > 0.5:
+                    if iou > self.chairs_iou:
                         del arr_empty_chairs[i]
                     
         # ------------------ TIMING  ------------------------------
@@ -132,6 +133,7 @@ class EmptySeatDetection():
                         bcolors.R+"[RoboBreizh - Vision]        Seats Detected but not within range. "+bcolors.ENDC)   
         
         self.visualiseRVIZ(ori_rgb_image_320)
+
         
         return seat_list
         

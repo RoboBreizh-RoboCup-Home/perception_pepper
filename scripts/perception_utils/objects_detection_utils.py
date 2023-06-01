@@ -61,8 +61,6 @@ def seat_person_mid_point_distance(boxA, boxB):
     
 def range_overlap(a_min, a_max, b_min, b_max, margin):
     """Neither range is completely greater than the other"""
-    print(b_max - a_min)
-    print(a_max - b_min)
     return (a_min + margin <= b_max) and (b_min + margin <= a_max)
 
 
