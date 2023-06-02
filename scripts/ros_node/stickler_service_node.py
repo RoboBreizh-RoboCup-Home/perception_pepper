@@ -97,7 +97,7 @@ class RuleStickler():
                         crop_person = ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :]
                         
                         # Shoe dectection
-                        shoes_detection_result = self.perform_detection(self.yolo_shoes_detector, crop_person, 
+                        shoes_detection_result = self.shoes_drink_inference(self.yolo_shoes_detector, crop_person, 
                                                                         [person_start_x, person_start_y, person_end_x, person_end_y],
                                                                         ori_rgb_image_320, ori_depth_image)
                         person.is_shoes = shoes_detection_result["is_detected"]
@@ -107,7 +107,7 @@ class RuleStickler():
                                 bcolors.R+"[RoboBreizh - Vision]        Human is not wearing any Shoes. "+bcolors.ENDC)   
                         
                         # Drink detection
-                        drink_detection_result = self.perform_detection(self.yolo_drink_detector, crop_person,
+                        drink_detection_result = self.shoes_drink_inference(self.yolo_drink_detector, crop_person,
                                                                         [person_start_x, person_start_y, person_end_x, person_end_y],
                                                                         ori_rgb_image_320, ori_depth_image)
                         
@@ -139,7 +139,7 @@ class RuleStickler():
         return person_list
         
     
-    def perform_detection(self, model, person_image,
+    def shoes_drink_inference(self, model, person_image,
                           person_coord=None, ori_rgb_image=None, ori_depth_image=None):
         return_dict = {
             "is_detected": False,
