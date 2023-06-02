@@ -81,49 +81,54 @@ class RuleStickler():
                     person_dist, person_point_x, person_point_y, person_point_z, _, _ = distances_utils.detectDistanceResolution(
                                         ori_depth_image, person_start_x, person_end_y, person_start_y, person_end_x, resolutionRGB=ori_rgb_image_320.shape[:2][::-1])
 
-                    if person_dist > self.distanceMax:
+                    if person_dist <= self.distanceMax:
+                        person_odom_point = tf_utils.compute_absolute_pose([person_point_x, person_point_y, person_point_z])
+                        
+                        # Create Person object
+                        person = Person()
+                        # Person attributes
+                        person.name.data = f"person_no_{i+1}"
+                        person.distance = person_dist
+                        person.coord.x = person_odom_point.x
+                        person.coord.y = person_odom_point.y
+                        person.coord.z = person_odom_point.z
+                        person_list.person_list.append(person)
+                        
+                        crop_person = ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :]
+                        
+                        # Shoe dectection
+                        shoes_detection_result = self.shoes_drink_inference(self.yolo_shoes_detector, crop_person, 
+                                                                        [person_start_x, person_start_y, person_end_x, person_end_y],
+                                                                        ori_rgb_image_320, ori_depth_image)
+                        person.is_shoes = shoes_detection_result["is_detected"]
+                        
+                        if not person.is_shoes:
+                            rospy.loginfo(
+                                bcolors.R+"[RoboBreizh - Vision]        Human is not wearing any Shoes. "+bcolors.ENDC)   
+                        
+                        # Drink detection
+                        drink_detection_result = self.shoes_drink_inference(self.yolo_drink_detector, crop_person,
+                                                                        [person_start_x, person_start_y, person_end_x, person_end_y],
+                                                                        ori_rgb_image_320, ori_depth_image)
+                        
+                        person.is_drink = drink_detection_result["is_detected"]
+                        
+                        if not person.is_drink:
+                            rospy.loginfo(
+                                bcolors.R+"[RoboBreizh - Vision]        Human is not holding any Drink. "+bcolors.ENDC)
+
+                        if self.VISUAL:
+                            cv2.rectangle(ori_rgb_image_320, 
+                                      (int(person_start_x), int(person_start_y)) , (int(person_end_x), int(person_end_y)), (0,255,255), 2)
+                            
+                    else:
                         rospy.loginfo(
                             bcolors.R+"[RoboBreizh - Vision]        Person Detected but not within range. "+bcolors.ENDC)
-                        continue
-                    
-                    person_odom_point = tf_utils.compute_absolute_pose([person_point_x, person_point_y, person_point_z])
-                    
-                    # Create Person object
-                    person = Person()
-                    # Person attributes
-                    person.name.data = f"person_no_{i+1}"
-                    person.distance = person_dist
-                    person.coord.x = person_odom_point.x
-                    person.coord.y = person_odom_point.y
-                    person.coord.z = person_odom_point.z
-                    person_list.person_list.append(person)
-                    
-                    crop_person = ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :]
-                    # Shoe dectection
-                    shoes_detection_result = self.perform_detection(self.yolo_shoes_detector, crop_person, crop_person.copy())
-                    person.is_shoes = shoes_detection_result["is_detected"]
-                    draw_image = shoes_detection_result["draw_image"]
-                    if not person.is_shoes:
-                        rospy.loginfo(
-                            bcolors.R+"[RoboBreizh - Vision]        No Shoes Detected. "+bcolors.ENDC)   
-                    
-                    # Drink detection
-                    drink_detection_result = self.perform_detection(self.yolo_drink_detector, crop_person, draw_image,
-                                                                    [person_start_x, person_end_y, person_start_y, person_end_x],
-                                                                    ori_rgb_image_320, ori_depth_image)
-                    person.is_drink = drink_detection_result["is_detected"]
-                    person.drink = drink_detection_result["drink_info"]
-                    draw_image = drink_detection_result["draw_image"]
-                    if not person.is_drink:
-                        rospy.loginfo(
-                            bcolors.R+"[RoboBreizh - Vision]        No Drink Detected. "+bcolors.ENDC)
-
-                    if self.VISUAL:
-                        ori_rgb_image_320[person_start_y: person_end_y, person_start_x: person_end_x, :] = draw_image
         
         else:
             rospy.loginfo(
                 bcolors.R+"[RoboBreizh - Vision]        No Person Detected. "+bcolors.ENDC) 
+            
             return person_list
             
                     
@@ -134,14 +139,10 @@ class RuleStickler():
         return person_list
         
     
-    def perform_detection(self, model, person_image, draw_image,
+    def shoes_drink_inference(self, model, person_image,
                           person_coord=None, ori_rgb_image=None, ori_depth_image=None):
-        
-        obj = Object()
         return_dict = {
             "is_detected": False,
-            "draw_image": draw_image,
-            "drink_info": obj
         }
         detected_classes = ["footwear", "drink"]
         detections = model.inference(person_image)
@@ -156,37 +157,28 @@ class RuleStickler():
                     end_y = detections[i]['box'][1] + detections[i]['box'][3]
                     
                     if person_coord:
-                        dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
-                                ori_depth_image, 
-                                start_x + person_coord[0], end_y + person_coord[1], 
-                                start_y + person_coord[2], end_x + person_coord[3], 
-                                resolutionRGB=ori_rgb_image.shape[:2][::-1])
                         
-                        odom_point = tf_utils.compute_absolute_pose([point_x, point_y, point_z])  
-                        # drink attribute
-                        return_dict["drink_info"].label = String(object_name)
-                        return_dict["drink_info"].distance = dist
-                        return_dict["drink_info"].coord.x = odom_point.x
-                        return_dict["drink_info"].coord.y = odom_point.y
-                        return_dict["drink_info"].coord.z = odom_point.z
+                        start_x_person_obj = (start_x + person_coord[0])
+                        start_y_person_obj = (start_y + person_coord[1])
+                        end_x_person_obj = (end_x + person_coord[0])
+                        end_y_person_obj = (end_y + person_coord[1])
                         
                     if self.VISUAL:
                         # Display detection results
-                        cv2.rectangle(draw_image, 
-                                      (int(start_x), int(start_y)) , (int(end_x), int(end_y)), (255,0,0), 2)
+                        cv2.rectangle(ori_rgb_image, 
+                                      (int(start_x_person_obj), int(start_y_person_obj)) , (int(end_x_person_obj), int(end_y_person_obj)), (255,255,0), 2)
         
-        return_dict["draw_image"] = draw_image   
         return return_dict
     
 
 if __name__ == "__main__":
     print(sys.version)
     rospy.init_node('rule_stickler_node', anonymous=True)
-    # VISUAL = True
-    # qi_ip ='192.168.50.44'
+    VISUAL = True
+    qi_ip ='192.168.50.44'
     
-    VISUAL = rospy.get_param('~visualize')
-    qi_ip = rospy.get_param('~qi_ip')
+    # VISUAL = rospy.get_param('~visualize')
+    # qi_ip = rospy.get_param('~qi_ip')
     
     depth_camera_res = res3D.R320x240
     rgb_camera_res = res2D.R320x240
