@@ -131,8 +131,8 @@ class EmptySeatDetection():
                 else:
                     rospy.loginfo(
                         bcolors.R+"[RoboBreizh - Vision]        Seats Detected but not within range. "+bcolors.ENDC)   
-        
-        self.visualiseRVIZ(ori_rgb_image_320)
+        if self.VISUAL:
+            self.visualiseRVIZ(ori_rgb_image_320)
 
         
         return seat_list
