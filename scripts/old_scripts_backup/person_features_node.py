@@ -38,7 +38,7 @@ class PersonFeatureDetection():
         self.conf_threshold = 0.5
         self.nms_threshold = 0.5
     
-        self.yolo_clothes_detector = YOLOV8(model_name=yolo_model,  conf_thres=self.conf_threshold, iou_thres=self.nms_threshold)
+        self.yolo_clothes_detector = YOLOV8(model_name=yolo_model,  _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
         self.face_detector = FaceDetection(face_model_name = face_model)
         self.age_gender_detector = AgeGender(age_gender_model = age_gender_model)
         self.caffe_age_detector = AgePrediction(age_model_name = cafffe_age_model)
