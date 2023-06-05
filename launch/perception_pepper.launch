@@ -105,7 +105,7 @@
 		</node>
 		<!-- Add bag detection node in order to find the bag -->
 		<node pkg="perception_pepper" type="bag_detection_node.py" name="bag_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node> 
 
@@ -127,11 +127,11 @@
 
 	<group if="$(arg stickler_for_the_rules)">
 		<node pkg="perception_pepper" type="drink_detection_node.py" name="drink_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 		<node pkg="perception_pepper" type="stickler_service_node.py" name="person_detection_node" output="screen">
-			<param name="visualize" value="True"/>
+			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
 	</group>
