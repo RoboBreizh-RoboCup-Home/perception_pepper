@@ -20,7 +20,7 @@
 
 	<group if="$(arg door)">
         <node pkg="perception_pepper" type="door_detection_node.py" name="door_detection_node" output="screen" >
-            <param name="MIN_DISTANCE_DOOR" value="0.8"/>
+            <param name="MIN_DISTANCE_DOOR" value="0.5"/>
         </node>
 
 	</group>
