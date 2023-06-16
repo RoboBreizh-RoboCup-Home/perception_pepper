@@ -56,6 +56,7 @@ class MinFrontValueDetector():
         while rospy.get_rostime() - beginning < timeout:
             # look if there is on obstacle within the set range
             if self._sonar_distance < self.min_distance:
+                print(f'{self._sonar_distance} < {self.min_distance}')
                 self._door_state = DoorState.CLOSE
                 rospy.loginfo(bcolors.BACKRED +
                               "[RoboBreizh - Door] door  " + bcolors.ENDC)
