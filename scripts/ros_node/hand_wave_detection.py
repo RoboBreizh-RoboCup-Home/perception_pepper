@@ -68,7 +68,7 @@ class HandWavingDetection():
         
         time_end = time.time()
         
-        print(time_end - time_start)
+        # print(time_end - time_start)
         
         if len(list_person)>0:
             for person in list_person:
@@ -124,11 +124,11 @@ if __name__ == "__main__":
     
     rospy.init_node('hand_waving_node', anonymous=True)
 
-    # VISUAL = rospy.get_param('~visualize')
-    # qi_ip = rospy.get_param('~qi_ip')
+    VISUAL = rospy.get_param('~visualize')
+    qi_ip = rospy.get_param('~qi_ip')
     
-    VISUAL = True
-    qi_ip = "192.168.50.44"
+    # VISUAL = True
+    # qi_ip = "192.168.50.44"
             
     depth_camera_res = res3D.R320x240
     rgb_camera_res = res2D.R320x240
