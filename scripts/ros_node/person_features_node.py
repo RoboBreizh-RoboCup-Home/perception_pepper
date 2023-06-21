@@ -98,10 +98,16 @@ class PersonFeatureDetection():
                     clothes_style = str(detections[0]['class_name'])
                     cropped_clothes = ori_rgb_image_320[int(clothes_start_y):int(clothes_end_y), int(clothes_start_x): int(clothes_end_x)]
                     
-                    ok, clothes_color,_, mapping = self.colour_detector.inference(cropped_clothes, 'clothes')      
+                    time_start_clothes = time.time()
+                    ok, clothes_color,_, mapping = self.colour_detector.inference(cropped_clothes, 'clothes')     
                     
+                    print("Clothes inference: " + str(time.time() - time_start_clothes)) 
+                    
+                    time_start_face = time.time()
                     # Face Detection
                     output, cropped_face_image, face_start_x, face_start_y, face_end_x, face_end_y = self.face_detector.inference(ori_rgb_image_320)
+                    
+                    print("face inference: " + str(time.time() - time_start_face)) 
                     
                     if (cropped_face_image is None):
                         age_caffee = ""
@@ -111,13 +117,21 @@ class PersonFeatureDetection():
                             bcolors.R+"[RoboBreizh - Vision]    Face not Detected"+bcolors.ENDC)    
                     else:
                         # Face, Age, Gender
+                        time_start_gender = time.time()
                         gender  = self.age_gender_detector.inference(cropped_face_image)
+                        print("gender inference: " + str(time.time() - time_start_gender)) 
+
                         
                         # Age from Caffee
+                        time_start_age = time.time()
                         age_caffee = self.caffe_age_detector.inference(cropped_face_image)
-                        
+                        print("age inference: " + str(time.time() - time_start_age)) 
+
+                        time_start_colour = time.time()
                         # Face Skin Colour detection
                         ok, skin_color,_, mapping = self.colour_detector.inference(cropped_face_image, 'skin')
+                        print("colour inference: " + str(time.time() - time_start_colour)) 
+
                         
                     # Create Person object
                     person = Person()
