@@ -173,7 +173,10 @@ class PersonTrackerNode():
 if __name__ == "__main__":
 
     rospy.init_node('person_tracker', anonymous=True, log_level=rospy.INFO)
-    qi_ip = rospy.get_param("~qi_ip")
+    # qi_ip = rospy.get_param("~qi_ip")
+
+    VISUAL = True
+    qi_ip = "192.168.50.44"
 
     # Cameras setting
     depth_camera_res = res3D.R320x240
