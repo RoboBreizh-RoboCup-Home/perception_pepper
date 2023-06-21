@@ -34,10 +34,10 @@ from PoseDetection.MoveNet_lightning.movenet_lightning import Movenet
 import time
 
 class PersonTrackerNode():
-    def __init__(self, model_name , cameras: nc.NaoqiCameras, width, height) -> None:
+    def __init__(self, model_name , cameras: nc.NaoqiCameras, width, height, VISUAL) -> None:
         
         
-        self.VISUAL = rospy.get_param("~visualize")
+        self.VISUAL = VISUAL
         self._cameras = cameras
         self.width = width
         self.height = height
@@ -187,5 +187,5 @@ if __name__ == "__main__":
     # Default model: single person tracker 
     pose_model = "movenet_lightning"
     cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
-    PersonTrackerNode(pose_model, cameras, rgb_camera_width,rgb_camera_height)
+    PersonTrackerNode(pose_model, cameras, rgb_camera_width,rgb_camera_height, VISUAL)
     rospy.spin()
