@@ -141,10 +141,6 @@
 	</group>
 
 	<group if="$(arg stickler_for_the_rules)">
-		<node pkg="perception_pepper" type="shoes_detection_node.py" name="shoes_detection_node" output="screen">
-			<param name="visualize" value="True"/>
-			<param name="qi_ip" value="$(arg qi_ip)"/>
-		</node>
 		<node pkg="perception_pepper" type="stickler_service_node.py" name="stickler_service_node" output="screen">
 			<param name="visualize" value="True"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
