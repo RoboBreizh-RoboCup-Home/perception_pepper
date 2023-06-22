@@ -47,8 +47,13 @@ class RuleStickler():
         if self.VISUAL: 
             self.bridge = CvBridge()
             self.pub_cv = rospy.Publisher('/roboBreizh_detector/stickler_detection_image', Image, queue_size=10)
+            self.pub_cv_shoes = rospy.Publisher('/roboBreizh_detector/shoes_detection_image', Image, queue_size=10)
+
         
         self.init_service()
+                
+        self.init_service_shoes()
+        
         rospy.spin()
 
     def init_service(self):
@@ -58,7 +63,7 @@ class RuleStickler():
             bcolors.O+"[RoboBreizh - Vision]        Starting Rule Stickler Service."+bcolors.ENDC)
         
         rospy.spin()
-        
+     
     def handle_service(self, person_request):
         
         self.distanceMax = person_request.entries_list.distanceMaximum
@@ -138,6 +143,74 @@ class RuleStickler():
     
         return person_list
         
+
+    def init_service_shoes(self):
+        rospy.Service('/robobreizh/perception_pepper/shoes_detection',
+                        shoes_detection, self.handle_service_shoes)
+        rospy.loginfo(
+            bcolors.O+"[RoboBreizh - Vision]        Starting Shoes Detection. "+bcolors.ENDC)
+        
+        rospy.spin()
+        
+    def handle_service_shoes(self, shoes_detection):
+        
+        ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
+        
+        self.distanceMax = shoes_detection.entries_list.distanceMaximum
+        obj_list= ObjectList()
+        obj_list.object_list = []
+        
+        time_start = time.time()
+        
+        ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
+        
+        detections = self.yolo_shoes_detector.inference(ori_rgb_image_320)
+        if (len(detections) > 0):
+            for i in range(len(detections)):
+                object_name = detections[i]['class_name']
+                if object_name == 'footwear':
+                    start_x = round(detections[i]['box'][0])
+                    end_x = round((detections[i]['box'][0] + detections[i]['box'][2]))
+                    start_y = round(detections[i]['box'][1])
+                    end_y = round((detections[i]['box'][1] + detections[i]['box'][3]))
+                                
+                    # Distance Detection
+                    dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
+                            ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=ori_rgb_image_320.shape[:2][::-1])
+                    
+                    odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
+
+                    time_end = time.time()
+                    rospy.loginfo("Total time inference: " + str(time_end-time_start))
+                    
+                    if dist > self.distanceMax:
+                        rospy.loginfo(
+                            bcolors.R+"[RoboBreizh - Vision]        Shoes Detected but not within range. "+bcolors.ENDC)
+                        continue
+                    
+                    if self.VISUAL:
+                        cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), (255,255,0), 0)
+
+                    obj = Object()
+                        
+                    # Chair attributes
+                    obj.label = String(object_name)
+                    obj.distance = dist
+                    obj.coord.x = odom_point.x
+                    obj.coord.y = odom_point.y
+                    obj.coord.z = odom_point.z
+                    
+                    obj_list.object_list.append(obj)
+                    
+        else:
+            rospy.loginfo(
+                    bcolors.R+"[RoboBreizh - Vision]        No Shoes Detected. "+bcolors.ENDC)  
+        
+        if self.VISUAL:
+            self.visualiseRVIZ(ori_rgb_image_320)
+    
+        return obj_list
+
     
     def shoes_drink_inference(self, model, person_image,
                           person_coord=None, ori_rgb_image=None, ori_depth_image=None):
@@ -170,6 +243,11 @@ class RuleStickler():
         
         return return_dict
     
+
+    def visualiseRVIZ(self, image):
+        
+        ros_image = self.bridge.cv2_to_imgmsg(image, "bgr8")
+        self.pub_cv.publish(ros_image) 
 
 if __name__ == "__main__":
     print(sys.version)
