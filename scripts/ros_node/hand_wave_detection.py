@@ -62,7 +62,13 @@ class HandWavingDetection():
         
         rgb_image, depth_image = self._cameras.get_image(out_format="cv2")
         
+        time_start = time.time()
+        
         list_person = self.pose_model.inference(rgb_image)
+        
+        time_end = time.time()
+        
+        # print(time_end - time_start)
         
         if len(list_person)>0:
             for person in list_person:

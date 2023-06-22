@@ -23,40 +23,40 @@ from perception_utils.bcolors import bcolors
 import perception_utils.distances_utils as distances_utils
 import perception_utils.transform_utils as tf_utils
 from robobreizh_msgs.msg import Object, ObjectList
-from robobreizh_msgs.srv import drink_detection
+from robobreizh_msgs.srv import shoes_detection
 import time
 
-class DrinkDetection():
+class ShoesDetection():
     def __init__(self, model_name , cameras: nc.NaoqiCameras, VISUAL) -> None:
         
         self.VISUAL = VISUAL
         self._cameras = cameras
-        self.conf_threshold = 0.3
+        self.conf_threshold = 0.65
         self.nms_threshold = 0.5
         self.distanceMax = 0
         self.model_name = model_name
-        self.yolo_drink_detector = YOLOV8(model_name=self.model_name,  _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
+        self.yolo_shoes_detector = YOLOV8(model_name=self.model_name,  _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
         
         if self.VISUAL: 
             self.bridge = CvBridge()
-            self.pub_cv = rospy.Publisher('/roboBreizh_detector/drink_detection_image', Image, queue_size=10)
+            self.pub_cv = rospy.Publisher('/roboBreizh_detector/shoes_detection_image', Image, queue_size=10)
         
         self.init_service()
         rospy.spin()
 
     def init_service(self):
-        rospy.Service('/robobreizh/perception_pepper/drink_detection',
-                        drink_detection, self.handle_service)
+        rospy.Service('/robobreizh/perception_pepper/shoes_detection',
+                        shoes_detection, self.handle_service)
         rospy.loginfo(
-            bcolors.O+"[RoboBreizh - Vision]        Starting Drink Detection. "+bcolors.ENDC)
+            bcolors.O+"[RoboBreizh - Vision]        Starting Shoes Detection. "+bcolors.ENDC)
         
         rospy.spin()
         
-    def handle_service(self, drink_detection):
+    def handle_service(self, shoes_detection):
         
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         
-        self.distanceMax = drink_detection.entries_list.distanceMaximum
+        self.distanceMax = shoes_detection.entries_list.distanceMaximum
         obj_list= ObjectList()
         obj_list.object_list = []
         
@@ -64,11 +64,11 @@ class DrinkDetection():
         
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         
-        detections = self.yolo_drink_detector.inference(ori_rgb_image_320)
+        detections = self.yolo_shoes_detector.inference(ori_rgb_image_320)
         if (len(detections) > 0):
             for i in range(len(detections)):
                 object_name = detections[i]['class_name']
-                if object_name == 'drink':
+                if object_name == 'footwear':
                     start_x = round(detections[i]['box'][0])
                     end_x = round((detections[i]['box'][0] + detections[i]['box'][2]))
                     start_y = round(detections[i]['box'][1])
@@ -85,7 +85,7 @@ class DrinkDetection():
                     
                     if dist > self.distanceMax:
                         rospy.loginfo(
-                            bcolors.R+"[RoboBreizh - Vision]        Drink Detected but not within range. "+bcolors.ENDC)
+                            bcolors.R+"[RoboBreizh - Vision]        Shoes Detected but not within range. "+bcolors.ENDC)
                         continue
                     
                     if self.VISUAL:
@@ -104,7 +104,7 @@ class DrinkDetection():
                     
         else:
             rospy.loginfo(
-                    bcolors.R+"[RoboBreizh - Vision]        No Drink Detected. "+bcolors.ENDC)  
+                    bcolors.R+"[RoboBreizh - Vision]        No Shoes Detected. "+bcolors.ENDC)  
         
                     
         if self.VISUAL:
@@ -121,7 +121,7 @@ class DrinkDetection():
 
 if __name__ == "__main__":
     
-    rospy.init_node('drink_detection_node', anonymous=True)
+    rospy.init_node('shoes_detection_node', anonymous=True)
     # VISUAL = True
     # qi_ip ='192.168.50.44'
     
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     
     depth_camera_res = res3D.R320x240
     rgb_camera_res = res2D.R320x240
-    model_name = 'drinks_320'
+    model_name = 'shoes_320'
     
     cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
-    DrinkDetection(model_name , cameras, VISUAL)
+    ShoesDetection(model_name , cameras, VISUAL)
