@@ -156,7 +156,7 @@ class RuleStickler():
         
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         
-        self.distanceMax = shoes_detection.entries_list.distanceMaximum
+        self.distanceMax = shoes_detection.distance_maximum
         obj_list= ObjectList()
         obj_list.object_list = []
         
@@ -207,7 +207,8 @@ class RuleStickler():
                     bcolors.R+"[RoboBreizh - Vision]        No Shoes Detected. "+bcolors.ENDC)  
         
         if self.VISUAL:
-            self.visualiseRVIZ(ori_rgb_image_320)
+            ros_image_shoes = self.bridge.cv2_to_imgmsg(ori_rgb_image_320, "bgr8")
+            self.pub_cv_shoes.publish(ros_image_shoes) 
     
         return obj_list
 
@@ -247,7 +248,7 @@ class RuleStickler():
     def visualiseRVIZ(self, image):
         
         ros_image = self.bridge.cv2_to_imgmsg(image, "bgr8")
-        self.pub_cv.publish(ros_image) 
+        self.pub_cv_shoes.publish(ros_image) 
 
 if __name__ == "__main__":
     print(sys.version)
