@@ -151,8 +151,8 @@ class RuleStickler():
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         
         self.distanceMax = shoes_detection.distance_max
-        obj_list= ObjectList()
-        obj_list.object_list = []
+        person_list = PersonList()
+        person_list.person_list = []
         
         time_start = time.time()
         
@@ -185,16 +185,17 @@ class RuleStickler():
                     if self.VISUAL:
                         cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), (255,255,0), 0)
 
-                    obj = Object()
+                    person = Object()
                         
                     # Chair attributes
-                    obj.label = String(object_name)
-                    obj.distance = dist
-                    obj.coord.x = odom_point.x
-                    obj.coord.y = odom_point.y
-                    obj.coord.z = odom_point.z
+                    person.label = String(object_name)
+                    person.distance = dist
+                    person.is_shoes
+                    person.coord.x = odom_point.x
+                    person.coord.y = odom_point.y
+                    person.coord.z = odom_point.z
                     
-                    obj_list.object_list.append(obj)
+                    person_list.object_list.append(person)
                     
         else:
             rospy.loginfo(
@@ -204,7 +205,7 @@ class RuleStickler():
             ros_image_shoes = self.bridge.cv2_to_imgmsg(ori_rgb_image_320, "bgr8")
             self.pub_cv_shoes.publish(ros_image_shoes) 
     
-        return obj_list
+        return person_list
 
     
     def shoes_drink_inference(self, model, person_image,
@@ -247,11 +248,11 @@ class RuleStickler():
 if __name__ == "__main__":
     print(sys.version)
     rospy.init_node('rule_stickler_node', anonymous=True)
-    VISUAL = True
-    qi_ip ='192.168.50.44'
+    # VISUAL = True
+    # qi_ip ='192.168.50.44'
     
-    # VISUAL = rospy.get_param('~visualize')
-    # qi_ip = rospy.get_param('~qi_ip')
+    VISUAL = rospy.get_param('~visualize')
+    qi_ip = rospy.get_param('~qi_ip')
     
     depth_camera_res = res3D.R320x240
     rgb_camera_res = res2D.R320x240
