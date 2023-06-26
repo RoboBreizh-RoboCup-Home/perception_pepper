@@ -278,7 +278,7 @@ def is_waving(person):
                       # print("left shoulder y:", shoulder_coordiante_list[1])
                       if limb_coordinate_list[1] < shoulder_coordinate_list[1]:
                           print("     -->  Found one waving hand")
-
+                        
                           return True
 
                   if limb == 'Right wrist' and shoulder == 'Right shoulder':
@@ -289,6 +289,57 @@ def is_waving(person):
 
                           return True
   return False
+
+
+def is_waving_gpsr(person):
+  
+  keypoints = person.keypoints
+  keypoint_threshold = 0.05
+
+  # Draw all the edges
+  for edge_pair, edg in KEYPOINT_EDGE_INDS_TO_COLOR.items():
+      if (keypoints[edge_pair[0]].score > keypoint_threshold and
+              keypoints[edge_pair[1]].score > keypoint_threshold):
+
+          dict_limb = {}
+          dict_shoulder = {}
+          limbs = ["Left wrist", "Left elbow",
+                    "Right wrist", "Right elbow"]
+          shoulders = ["Left shoulder", "Right shoulder"]
+
+          for pose in keypoints:
+              if body_part_list[pose[0].value] in limbs:
+                  coordinate_limb_list = []
+                  coordinate_limb_list.append(pose[1].x)
+                  coordinate_limb_list.append(pose[1].y)
+                  dict_limb[str(body_part_list[pose[0].value])
+                            ] = coordinate_limb_list
+
+              if body_part_list[pose[0].value] in shoulders:
+                  coordinate_shoulder_list = []
+                  coordinate_shoulder_list.append(pose[1].x)
+                  coordinate_shoulder_list.append(pose[1].y)
+                  dict_shoulder[body_part_list[pose[0].value]
+                                ] = coordinate_shoulder_list
+
+          for limb, limb_coordinate_list in dict_limb.items():
+              for shoulder, shoulder_coordinate_list in dict_shoulder.items():
+                  if limb == 'Left wrist' and shoulder == 'Left shoulder':
+                      # print("left limb y:", limb_coordinate_list[1])
+                      # print("left shoulder y:", shoulder_coordiante_list[1])
+                      if limb_coordinate_list[1] < shoulder_coordinate_list[1]:
+                          print("     -->  Found one waving hand")
+                        
+                          return "waving_left"
+
+                  if limb == 'Right wrist' and shoulder == 'Right shoulder':
+                      # print("right limb y:", limb_coordinate_list[1])
+                      # print("right shoulder y:", shoulder_coordiante_list[1])
+                      if limb_coordinate_list[1] < shoulder_coordinate_list[1]:
+                          print("     -->  Found one waving hand")
+
+                          return "waving_right"
+  return "No_waving"
 
 def keep_aspect_ratio_resizer(
     image: np.ndarray, target_size: int) -> Tuple[np.ndarray, Tuple[int, int]]:
@@ -417,13 +468,11 @@ def is_pointing(person):
                                 #print(hips_coordinate_list)
                                 #print(coordinate_wrist_list)
                                 distanceL = getDistance(hips_coordinate_list, coordinate_wrist_list)
-                                print("distance Hip/Wrist LEFT : " +str(distanceL))
                             if (hip == 'Right hip' and wrist == 'Right wrist'):
                                 #print('RIGHT :')
                                 #print(hips_coordinate_list)
                                 #print(coordinate_wrist_list)
                                 distanceR = getDistance(hips_coordinate_list, coordinate_wrist_list)
-                                print("distance Hip/Wrist LEFT : " +str(distanceR))
 
                             if(distanceR > thresoldDistance): bPointing = 1
                             if(distanceL > thresoldDistance): bPointing = 1
