@@ -19,7 +19,7 @@ from perception_utils.utils import get_pkg_path
 from models.PoseDetection.MoveNet_MultiPose.movenet_multipose import MoveNetMultiPose
 from models.PoseDetection.roboBreizh_Utils_pose import visualize
 from models.PoseDetection.roboBreizh_Utils_pose import is_pointing
-from models.PoseDetection.roboBreizh_Utils_pose import is_waving
+from models.PoseDetection.roboBreizh_Utils_pose import is_waving_gpsr
 from robobreizh_msgs.msg import *
 from robobreizh_msgs.srv import *
 import tf2_ros
@@ -62,7 +62,7 @@ class GPSRGestureDetection():
         rightList = []
         topList = []
         
-        waving = False 
+        iswaving = False 
         raising_left = False 
         raising_right = False 
         pointing_right = False 
@@ -95,18 +95,30 @@ class GPSRGestureDetection():
                     
                     bPointing, bRight, bTop = is_pointing(person)
                     
-                    print("bRight")
-                    print(bRight)
+                    if bRight == 1:
+                        rospy.loginfo("Human Pointing to Right Found")
+                        pointing_right = True
+                    else:
+                        rospy.loginfo("Human Pointing to Left Found")
+                        pointing_left = True
                     
-                    iswaving = is_waving(person)
-
+                    waving_side = is_waving_gpsr(person)
+                    
+                    if waving_side == "waving_left":
+                        rospy.loginfo("Human Waving Found")
+                        rospy.loginfo("Human Raising Left Arm Found")
+                        raising_left = True
+                        iswaving = True
+                    if waving_side == "waving_right":
+                        rospy.loginfo("Human Waving Found")
+                        rospy.loginfo("Human Raising Right Arm Found")
+                        raising_right = True
+                        iswaving = True
+                        
                     if dist <= self.distanceMax:
                         if bPointing:
                             rightList.append(bRight)
                             topList.append(bTop)
-                            
-                            print(rightList)
-                            print(topList)
                             
                         person_pose = PersonPose()
                         person_pose.person_id = String(str(person.id))
@@ -134,7 +146,7 @@ class GPSRGestureDetection():
         
         if self.VISUAL:
             self.visualiseRVIZ(rgb_image)
-            
+        
         return person_list
     
     def visualiseRVIZ(self, chair_image):
