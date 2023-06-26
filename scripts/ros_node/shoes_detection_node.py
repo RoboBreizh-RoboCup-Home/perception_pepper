@@ -56,7 +56,7 @@ class ShoesDetection():
         
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         
-        self.distanceMax = shoes_detection.entries_list.distanceMaximum
+        self.distanceMax = shoes_detection.distance_max
         obj_list= ObjectList()
         obj_list.object_list = []
         
