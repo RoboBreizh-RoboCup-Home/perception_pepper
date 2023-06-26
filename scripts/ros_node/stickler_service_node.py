@@ -22,8 +22,8 @@ from models.ObjectDetection.YOLOV8.yolov8 import YOLOV8
 from perception_utils.bcolors import bcolors
 import perception_utils.distances_utils as distances_utils
 import perception_utils.transform_utils as tf_utils
-from robobreizh_msgs.msg import Person, PersonList, Object
-from robobreizh_msgs.srv import person_features_detection_service
+from robobreizh_msgs.msg import Person, PersonList, Object, ObjectList
+from robobreizh_msgs.srv import person_features_detection_service, shoes_detection
 import time
 
 class RuleStickler():
