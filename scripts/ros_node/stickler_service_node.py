@@ -52,7 +52,6 @@ class RuleStickler():
         
         self.init_service()
                 
-        self.init_service_shoes()
         
         rospy.spin()
 
@@ -61,8 +60,11 @@ class RuleStickler():
                         person_features_detection_service, self.handle_service)
         rospy.loginfo(
             bcolors.O+"[RoboBreizh - Vision]        Starting Rule Stickler Service."+bcolors.ENDC)
-        
-        rospy.spin()
+
+        rospy.Service('/robobreizh/perception_pepper/shoes_detection',
+                        shoes_detection, self.handle_service_shoes)
+        rospy.loginfo(
+            bcolors.O+"[RoboBreizh - Vision]        Starting Shoes Detection. "+bcolors.ENDC)
      
     def handle_service(self, person_request):
         
@@ -144,19 +146,12 @@ class RuleStickler():
         return person_list
         
 
-    def init_service_shoes(self):
-        rospy.Service('/robobreizh/perception_pepper/shoes_detection',
-                        shoes_detection, self.handle_service_shoes)
-        rospy.loginfo(
-            bcolors.O+"[RoboBreizh - Vision]        Starting Shoes Detection. "+bcolors.ENDC)
-        
-        rospy.spin()
         
     def handle_service_shoes(self, shoes_detection):
         
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         
-        self.distanceMax = shoes_detection.distance_maximum
+        self.distanceMax = shoes_detection.distance_max
         obj_list= ObjectList()
         obj_list.object_list = []
         
