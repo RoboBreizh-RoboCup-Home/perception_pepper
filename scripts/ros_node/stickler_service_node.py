@@ -187,14 +187,14 @@ class RuleStickler():
                     if self.VISUAL:
                         cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), (255,255,0), 0)
 
-                    person = Object()
+                    person = Person()
                         
                     # Chair attributes
-                    person.label = String(object_name)
+                    person.name = String(object_name)
                     person.distance = dist
                     person.is_shoes = shoes_on
                     
-                    person_list.object_list.append(person)
+                    person_list.person_list.append(person)
                     
         else:
             rospy.loginfo(
