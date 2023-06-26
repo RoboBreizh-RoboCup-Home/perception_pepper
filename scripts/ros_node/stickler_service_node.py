@@ -52,7 +52,6 @@ class RuleStickler():
         
         self.init_service()
                 
-        self.init_service_shoes()
         
         rospy.spin()
 
@@ -61,8 +60,11 @@ class RuleStickler():
                         person_features_detection_service, self.handle_service)
         rospy.loginfo(
             bcolors.O+"[RoboBreizh - Vision]        Starting Rule Stickler Service."+bcolors.ENDC)
-        
-        rospy.spin()
+
+        rospy.Service('/robobreizh/perception_pepper/shoes_detection',
+                        shoes_detection, self.handle_service_shoes)
+        rospy.loginfo(
+            bcolors.O+"[RoboBreizh - Vision]        Starting Shoes Detection. "+bcolors.ENDC)
      
     def handle_service(self, person_request):
         
@@ -144,13 +146,6 @@ class RuleStickler():
         return person_list
         
 
-    def init_service_shoes(self):
-        rospy.Service('/robobreizh/perception_pepper/shoes_detection',
-                        shoes_detection, self.handle_service_shoes)
-        rospy.loginfo(
-            bcolors.O+"[RoboBreizh - Vision]        Starting Shoes Detection. "+bcolors.ENDC)
-        
-        rospy.spin()
         
     def handle_service_shoes(self, shoes_detection):
         
