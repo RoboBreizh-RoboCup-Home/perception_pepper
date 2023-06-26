@@ -156,6 +156,8 @@ class RuleStickler():
         
         time_start = time.time()
         
+        shoes_on = True
+        
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         
         detections = self.yolo_shoes_detector.inference(ori_rgb_image_320)
@@ -190,10 +192,7 @@ class RuleStickler():
                     # Chair attributes
                     person.label = String(object_name)
                     person.distance = dist
-                    person.is_shoes
-                    person.coord.x = odom_point.x
-                    person.coord.y = odom_point.y
-                    person.coord.z = odom_point.z
+                    person.is_shoes = shoes_on
                     
                     person_list.object_list.append(person)
                     
