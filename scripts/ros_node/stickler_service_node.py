@@ -49,9 +49,7 @@ class RuleStickler():
             self.pub_cv = rospy.Publisher('/roboBreizh_detector/stickler_detection_image', Image, queue_size=10)
             self.pub_cv_shoes = rospy.Publisher('/roboBreizh_detector/shoes_detection_image', Image, queue_size=10)
 
-        
         self.init_service()
-                
         
         rospy.spin()
 
@@ -61,8 +59,9 @@ class RuleStickler():
         rospy.loginfo(
             bcolors.O+"[RoboBreizh - Vision]        Starting Rule Stickler Service."+bcolors.ENDC)
 
-        # rospy.Service('/robobreizh/perception_pepper/shoes_detection',
-        #                 shoes_detection, self.handle_service_shoes)
+        rospy.Service('/robobreizh/perception_pepper/shoes_detection',
+                        shoes_detection, self.handle_service_shoes)
+        
         rospy.loginfo(
             bcolors.O+"[RoboBreizh - Vision]        Starting Shoes Detection. "+bcolors.ENDC)
      
