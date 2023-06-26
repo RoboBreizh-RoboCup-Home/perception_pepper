@@ -61,8 +61,8 @@ class RuleStickler():
         rospy.loginfo(
             bcolors.O+"[RoboBreizh - Vision]        Starting Rule Stickler Service."+bcolors.ENDC)
 
-        rospy.Service('/robobreizh/perception_pepper/shoes_detection',
-                        shoes_detection, self.handle_service_shoes)
+        # rospy.Service('/robobreizh/perception_pepper/shoes_detection',
+        #                 shoes_detection, self.handle_service_shoes)
         rospy.loginfo(
             bcolors.O+"[RoboBreizh - Vision]        Starting Shoes Detection. "+bcolors.ENDC)
      
