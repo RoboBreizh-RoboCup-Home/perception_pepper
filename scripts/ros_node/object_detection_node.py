@@ -31,7 +31,7 @@ class ObjectDetection():
         self.VISUAL = VISUAL
         self._cameras = cameras
         self.model_name = model_name
-        self.conf_threshold = 0.3
+        self.conf_threshold = 0.4
         self.nms_threshold = 0.5
         self.object_requested_list = []
         self.distanceMax = 0
@@ -43,9 +43,12 @@ class ObjectDetection():
         
         if self.VISUAL: 
             self.bridge = CvBridge()
-            # self.pub_opencv = rospy.Publisher('/roboBreizh_detector/object_detection_raw_image', Image, queue_size=10)
-            self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/object_detection_compressed_image",
-            CompressedImage,  queue_size=10)
+            self.pub_opencv = rospy.Publisher('/roboBreizh_detector/object_detection_raw_image', Image, queue_size=10)
+            rng = np.random.default_rng(3)
+            self.colors = rng.uniform(0, 255, size=(len(self.yolo_detector.classes), 3))
+
+            # self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/object_detection_compressed_image",
+            # CompressedImage,  queue_size=10)
         
         self.initObjectDescriptionService()
         
@@ -82,6 +85,8 @@ class ObjectDetection():
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         detections = self.yolo_detector.inference(ori_rgb_image_320)
         
+        image_height, image_width = ori_rgb_image_320.shape[0], ori_rgb_image_320.shape[1]
+        
         if (len(detections)>0):       
             for i in range(len(detections)):
                 object_name = detections[i]['class_name']
@@ -95,7 +100,7 @@ class ObjectDetection():
 
                         # Distance Detection
                         dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
-                                ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=[ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
+                                ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=[image_width, image_height])
                         
                         odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
                         
@@ -134,7 +139,11 @@ class ObjectDetection():
                     odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
                     
                     if self.VISUAL:
-                        cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), (255,255,0), 0) 
+                        size = min([image_height, image_width]) * 0.001
+                        text_thickness = int(min([image_height, image_width]) * 0.001)
+                        color = self.colors[self.yolo_detector.classes.index(object_name)]
+                        cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), color, 0)
+                        cv2.putText(ori_rgb_image_320, object_name, (start_x, start_y),  cv2.FONT_HERSHEY_SIMPLEX, size, (0, 0, 0), text_thickness, cv2.LINE_AA)
 
                     if dist < self.distanceMax:
                         obj = Object()
@@ -165,29 +174,29 @@ class ObjectDetection():
     
     def visualiseRVIZ(self, cv_image):
         
-        # ros_image = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
-        # self.pub_opencv.publish(ros_image) 
+        ros_image = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
+        self.pub_opencv.publish(ros_image) 
         
-        #### Create CompressedIamge ####
-        msg = CompressedImage()
-        msg.header.stamp = rospy.Time.now()
-        msg.format = "jpeg"
-        msg.data = np.array(cv2.imencode('.jpg', cv_image)[1]).tostring()
-        # Publish new image
-        self.pub_compressed_img.publish(msg)
+        # #### Create CompressedIamge ####
+        # msg = CompressedImage()
+        # msg.header.stamp = rospy.Time.now()
+        # msg.format = "jpeg"
+        # msg.data = np.array(cv2.imencode('.jpg', cv_image)[1]).tostring()
+        # # Publish new image
+        # self.pub_compressed_img.publish(msg)
 
 if __name__ == "__main__":
     
     rospy.init_node('object_detection_node', anonymous=True)
 
-    VISUAL = rospy.get_param('~visualize')
-    qi_ip = rospy.get_param('~qi_ip')
+    # VISUAL = rospy.get_param('~visualize')
+    # qi_ip = rospy.get_param('~qi_ip')
     
-    # VISUAL = True
-    # qi_ip = "192.168.50.44"
+    VISUAL = True
+    qi_ip = "192.168.50.44"
             
     depth_camera_res = res3D.R320x240
     rgb_camera_res = res2D.R320x240
  
     cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
-    ObjectDetection("coco_320", cameras, VISUAL)
+    ObjectDetection("robocup_320", cameras, VISUAL)
