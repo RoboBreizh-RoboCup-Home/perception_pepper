@@ -63,7 +63,7 @@ class ObjectDetection():
         self.distanceMax = object_detection_service.entries_list.distanceMaximum
         
         for i in range(len(objects_Requested.obj)):
-            self.object_requested_list.append(objects_Requested.obj[i].data)
+            self.object_requested_list.append((objects_Requested.obj[i].data).lower())
         
         print("Object Requested List: ")
         print(self.object_requested_list)
@@ -190,4 +190,4 @@ if __name__ == "__main__":
     rgb_camera_res = res2D.R320x240
  
     cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
-    ObjectDetection("ycb_320", cameras, VISUAL)
+    ObjectDetection("coco_320", cameras, VISUAL)
