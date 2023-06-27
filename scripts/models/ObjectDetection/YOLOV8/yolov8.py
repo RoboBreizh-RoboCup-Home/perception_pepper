@@ -24,7 +24,18 @@ class YOLOV8(Model):
                 
     def get_model(self, model_name,_conf_threshold, _iou_threshold, inference_engine):
         
-        self.path_catalog = {'ycb_320': {
+        self.path_catalog = {
+            'robocup_320': {
+            'engine' : inference_engine,
+            'model_name': model_name,
+            '_conf_threshold': _conf_threshold, 
+            '_iou_threshold': _iou_threshold, 
+            'type': 'onnx',
+            'model_path':  'scripts/models/ObjectDetection/YOLOV8/weights/RoboCup/robocup.onnx',
+            'classes': 'scripts/models/ObjectDetection/YOLOV8/weights/RoboCup/robocup.txt',
+            'input_size': 320,
+            },
+            'ycb_320': {
             'engine' : inference_engine,
             'model_name': model_name,
             '_conf_threshold': _conf_threshold, 
