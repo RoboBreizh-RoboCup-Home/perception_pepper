@@ -191,6 +191,7 @@ if __name__ == "__main__":
 
     VISUAL = rospy.get_param('~visualize')
     qi_ip = rospy.get_param('~qi_ip')
+    model_name = rospy.get_param('~model_name')
     
     # VISUAL = True
     # qi_ip = "192.168.50.44"
@@ -199,4 +200,4 @@ if __name__ == "__main__":
     rgb_camera_res = res2D.R320x240
  
     cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
-    ObjectDetection("robocup_320", cameras, VISUAL)
+    ObjectDetection(model_name, cameras, VISUAL)

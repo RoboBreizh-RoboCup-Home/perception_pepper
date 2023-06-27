@@ -23,7 +23,7 @@ from robobreizh_msgs.srv import *
 import tf2_ros
 import time
 
-class ObjectDetection():
+class CategoryDetection():
         
     def __init__(self , model_name, cameras: nc.NaoqiCameras, VISUAL) -> None:
         
@@ -52,15 +52,15 @@ class ObjectDetection():
         
         self.initObjectDescriptionService()
         
-    def initObjectDescriptionService(self):
-        rospy.Service('/robobreizh/perception_pepper/object_detection',
-                        object_detection_service, self.handle_ServicePerceptionObject)
+    def initCategoryDescriptionService(self):
+        rospy.Service('/robobreizh/perception_pepper/category_detection',
+                        category_detection_service, self.handle_ServicePerceptionCategory)
             
         rospy.loginfo(
             bcolors.O+"[RoboBreizh - Vision]        Starting Objects Detection. "+bcolors.ENDC)
         rospy.spin()
 
-    def handle_ServicePerceptionObject(self, object_detection_service):
+    def handle_ServicePerceptionCategory(self, object_detection_service):
         
         objects_Requested = object_detection_service.entries_list
         self.distanceMax = object_detection_service.entries_list.distanceMaximum
@@ -75,7 +75,7 @@ class ObjectDetection():
         
         RequestObject = ((self.object_requested_list)[0] != '')
         
-        # Create Chair list object
+        # Create Object list
         obj_list= ObjectList()
         obj_list.object_list = []
         
@@ -86,81 +86,50 @@ class ObjectDetection():
         detections = self.yolo_detector.inference(ori_rgb_image_320)
         
         image_height, image_width = ori_rgb_image_320.shape[0], ori_rgb_image_320.shape[1]
-        
-        if (len(detections)>0):       
-            for i in range(len(detections)):
+        left_most = ""
+        right_most = ""
+        if (len(detections)>0):
+            left_most, right_most = self.compute_relative_pose(detections)
+            for i in zip(left_most, right_most):
                 object_name = detections[i]['class_name']
-                if (RequestObject):
-                    rospy.loginfo("Detecting Requested objects only")
-                    if object_name in self.object_requested_list:
-                        start_x = round(detections[i]['box'][0])
-                        end_x = round((detections[i]['box'][0] + detections[i]['box'][2]))
-                        start_y = round(detections[i]['box'][1])
-                        end_y = round((detections[i]['box'][1] + detections[i]['box'][3]))
 
-                        # Distance Detection
-                        dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
-                                ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=[image_width, image_height])
-                        
-                        odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
-                        
-                        if dist < self.distanceMax:
-                            obj = Object()
-                                
-                            # Chair attributes
-                            obj.label = String(object_name)
-                            obj.distance = dist
-                            obj.coord.x = odom_point.x
-                            obj.coord.y = odom_point.y
-                            obj.coord.z = odom_point.z
-                            
-                            obj_list.object_list.append(obj)
-                        else:
-                            rospy.loginfo(
-                                bcolors.R+"[RoboBreizh - Vision]       Objects(Requested Classes) Detected but not within range. "+bcolors.ENDC) 
-                        
-                        if self.VISUAL:
-                            cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), (255,255,0), 0)                        
-                        
-                    else:
-                        rospy.loginfo(
-                            bcolors.R+"[RoboBreizh - Vision]        Requested Objects Not Detected. "+bcolors.ENDC)   
-                else:
-                    rospy.loginfo("Detecting all objects")
-                    start_x = round(detections[i]['box'][0])
-                    end_x = round((detections[i]['box'][0] + detections[i]['box'][2]))
-                    start_y = round(detections[i]['box'][1])
-                    end_y = round((detections[i]['box'][1] + detections[i]['box'][3]))
-                    
-                    # Distance Detection
-                    dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
-                            ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=[ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
-                    
-                    odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
-                    
-                    if self.VISUAL:
-                        size = min([image_height, image_width]) * 0.001
-                        text_thickness = int(min([image_height, image_width]) * 0.001)
-                        color = self.colors[self.yolo_detector.classes.index(object_name)]
-                        cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), color, 0)
-                        cv2.putText(ori_rgb_image_320, object_name, (start_x, start_y),  cv2.FONT_HERSHEY_SIMPLEX, size, (0, 0, 0), text_thickness, cv2.LINE_AA)
+                start_x = round(detections[i]['box'][0])
+                end_x = round((detections[i]['box'][0] + detections[i]['box'][2]))
+                start_y = round(detections[i]['box'][1])
+                end_y = round((detections[i]['box'][1] + detections[i]['box'][3]))
+                
+                if self.VISUAL:
+                    size = min([image_height, image_width]) * 0.001
+                    text_thickness = int(min([image_height, image_width]) * 0.001)
+                    color = self.colors[self.yolo_detector.classes.index(object_name)]
+                    cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), color, 0)
+                    cv2.putText(ori_rgb_image_320, object_name, (start_x, start_y),  cv2.FONT_HERSHEY_SIMPLEX, size, (0, 0, 0), text_thickness, cv2.LINE_AA)
+                
+                # Distance Detection
+                dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
+                        ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=[ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
+                
+                odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
+                
+                if self.VISUAL:
+                    size = min([image_height, image_width]) * 0.001
+                    text_thickness = int(min([image_height, image_width]) * 0.001)
+                    color = self.colors[self.yolo_detector.classes.index(object_name)]
+                    cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), color, 0)
+                    cv2.putText(ori_rgb_image_320, object_name, (start_x, start_y),  cv2.FONT_HERSHEY_SIMPLEX, size, (0, 0, 0), text_thickness, cv2.LINE_AA)
 
-                    if dist < self.distanceMax:
-                        obj = Object()
-                            
-                        # Chair attributes
-                        obj.label = String(object_name)
-                        obj.distance = dist
-                        obj.coord.x = odom_point.x
-                        obj.coord.y = odom_point.y
-                        obj.coord.z = odom_point.z
+                if dist < self.distanceMax:
+                    obj = Object()
                         
-                        obj_list.object_list.append(obj)
+                    # Chair attributes
+                    obj.label = String(object_name)
+                    obj.distance = dist
+                    obj.coord.x = odom_point.x
+                    obj.coord.y = odom_point.y
+                    obj.coord.z = odom_point.z
                     
-                    else:
-                        rospy.loginfo(
-                            bcolors.R+"[RoboBreizh - Vision]       Objects(All Classes) Detected but not within range. "+bcolors.ENDC)   
-                        
+                    obj_list.object_list.append(obj)
+
             time_end = time.time()
             rospy.loginfo("Total time inference: " + str(time_end-time_start))
         else:
@@ -171,6 +140,20 @@ class ObjectDetection():
             self.visualiseRVIZ(ori_rgb_image_320)
         
         return obj_list
+    
+    def compute_relative_pose(self, detections):
+        left_most = 10000
+        right_most = 0
+        left_most_object = ""
+        right_most_object = ""
+        for i in range(len(detections)):
+            if detections[i]['box'][0] < left_most:
+                left_most = detections[i]['box'][0]
+                left_most_object = i
+            if detections[i]['box'][0] > right_most:
+                right_most = detections[i]['box'][0]
+                right_most_object = i
+        return left_most_object, right_most_object
     
     def visualiseRVIZ(self, cv_image):
         
@@ -187,7 +170,8 @@ class ObjectDetection():
 
 if __name__ == "__main__":
     
-    rospy.init_node('object_detection_node', anonymous=True)
+    rospy.init_node('category_detection_node', anonymous=True)
+    model_name = rospy.get_param('~model_name')
 
     # VISUAL = rospy.get_param('~visualize')
     # qi_ip = rospy.get_param('~qi_ip')
@@ -199,4 +183,4 @@ if __name__ == "__main__":
     rgb_camera_res = res2D.R320x240
  
     cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
-    ObjectDetection("robocup_320", cameras, VISUAL)
+    CategoryDetection(model_name, cameras, VISUAL)
