@@ -31,8 +31,8 @@ class YOLOV8(Model):
             '_conf_threshold': _conf_threshold, 
             '_iou_threshold': _iou_threshold, 
             'type': 'onnx',
-            'model_path':  'scripts/models/ObjectDetection/YOLOV8/weights/RoboCup/robocup.onnx',
-            'classes': 'scripts/models/ObjectDetection/YOLOV8/weights/RoboCup/robocup.txt',
+            'model_path':  'scripts/models/ObjectDetection/YOLOV8/weights/robocup/robocup.onnx',
+            'classes': 'scripts/models/ObjectDetection/YOLOV8/weights/robocup/robocup.txt',
             'input_size': 320,
             },
             'ycb_320': {
