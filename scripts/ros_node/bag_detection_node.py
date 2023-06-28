@@ -10,7 +10,7 @@ import rospy
 import Camera.Naoqi_camera as nc
 import Camera.naoqi_camera_types as camera_types
 from Camera.naoqi_camera_types import CameraID, CameraResolution2D as res2D, CameraResolution3D as res3D, ColorSpace2D as cs2D, ColorSpace3D as cs3D
-from sensor_msgs.msg import Image, CameraInfo
+from sensor_msgs.msg import Image, CameraInfo, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
 from std_msgs.msg import String
 import cv2
@@ -40,7 +40,9 @@ class BagDetection():
         if self.VISUAL: 
             self.bridge = CvBridge()
             self.pub_cv = rospy.Publisher('/roboBreizh_detector/bag_detection_image', Image, queue_size=10)
-        
+            self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/bag_detection_compressed_image",
+            CompressedImage,  queue_size=10)
+                    
         self.init_service()
         rospy.spin()
 
@@ -114,6 +116,14 @@ class BagDetection():
         
         ros_image = self.bridge.cv2_to_imgmsg(image, "bgr8")
         self.pub_cv.publish(ros_image) 
+        
+        #### Create CompressedIamge ####
+        msg = CompressedImage()
+        msg.header.stamp = rospy.Time.now()
+        msg.format = "jpeg"
+        msg.data = np.array(cv2.imencode('.jpg', image)[1]).tostring()
+        # Publish new image
+        self.pub_compressed_img.publish(msg)
     
 
 if __name__ == "__main__":

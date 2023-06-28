@@ -46,9 +46,8 @@ class ObjectDetection():
             self.pub_opencv = rospy.Publisher('/roboBreizh_detector/object_detection_raw_image', Image, queue_size=10)
             rng = np.random.default_rng(3)
             self.colors = rng.uniform(0, 255, size=(len(self.yolo_detector.classes), 3))
-
-            # self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/object_detection_compressed_image",
-            # CompressedImage,  queue_size=10)
+            self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/object_detection_compressed_image",
+            CompressedImage,  queue_size=10)
         
         self.initObjectDescriptionService()
         
@@ -84,6 +83,9 @@ class ObjectDetection():
         # retrieve rgb and depth image from Naoqi camera
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         detections = self.yolo_detector.inference(ori_rgb_image_320)
+        
+        time_end = time.time()
+        rospy.loginfo("Total time inference: " + str(time_end-time_start))
         
         image_height, image_width = ori_rgb_image_320.shape[0], ori_rgb_image_320.shape[1]
         
@@ -160,9 +162,7 @@ class ObjectDetection():
                     else:
                         rospy.loginfo(
                             bcolors.R+"[RoboBreizh - Vision]       Objects(All Classes) Detected but not within range. "+bcolors.ENDC)   
-                        
-            time_end = time.time()
-            rospy.loginfo("Total time inference: " + str(time_end-time_start))
+
         else:
             rospy.loginfo(
                 bcolors.R+"[RoboBreizh - Vision]        No Objects Detected. "+bcolors.ENDC)               
@@ -177,13 +177,13 @@ class ObjectDetection():
         ros_image = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
         self.pub_opencv.publish(ros_image) 
         
-        # #### Create CompressedIamge ####
-        # msg = CompressedImage()
-        # msg.header.stamp = rospy.Time.now()
-        # msg.format = "jpeg"
-        # msg.data = np.array(cv2.imencode('.jpg', cv_image)[1]).tostring()
-        # # Publish new image
-        # self.pub_compressed_img.publish(msg)
+        #### Create CompressedIamge ####
+        msg = CompressedImage()
+        msg.header.stamp = rospy.Time.now()
+        msg.format = "jpeg"
+        msg.data = np.array(cv2.imencode('.jpg', cv_image)[1]).tostring()
+        # Publish new image
+        self.pub_compressed_img.publish(msg)
 
 if __name__ == "__main__":
     
