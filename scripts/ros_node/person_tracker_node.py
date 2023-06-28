@@ -2,6 +2,7 @@
 
 # import types
 from typing import List
+import numpy as np 
 
 # import roslib
 import rospy
@@ -11,6 +12,7 @@ import actionlib
 import Camera.Naoqi_camera as nc
 from Camera.naoqi_camera_types import CameraResolution2D as res2D, CameraResolution3D as res3D 
 from sensor_msgs.msg import Image
+from sensor_msgs.msg import CompressedImage
 from cv_bridge import CvBridge
 import cv2
 from geometry_msgs.msg import Point32
@@ -46,6 +48,8 @@ class PersonTrackerNode():
         self.person_threshold = 0.4
         if self.VISUAL: 
             self.pub_cv = rospy.Publisher('/roboBreizh_detector/person_tracker_image', Image, queue_size=10)
+            self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/person_tracker_compressed_image",
+            CompressedImage,  queue_size=10)
             self.bridge = CvBridge()
              # Publisher for Markers
             self.marker_arr_pub = rospy.Publisher(
@@ -131,6 +135,15 @@ class PersonTrackerNode():
                     if self.VISUAL:  
                         pose_image = self.bridge.cv2_to_imgmsg(rgb_image, "bgr8")
                         self.pub_cv.publish(pose_image)    
+                        
+                        #### Create CompressedIamge ####
+                        msg = CompressedImage()
+                        msg.header.stamp = rospy.Time.now()
+                        msg.format = "jpeg"
+                        msg.data = np.array(cv2.imencode('.jpg', rgb_image)[1]).tostring()
+                        # Publish new image
+                        self.pub_compressed_img.publish(msg)
+                        
                         obj_list = ObjectList()
                         obj_list.object_list =[]
                         obj = Object()
@@ -141,6 +154,7 @@ class PersonTrackerNode():
                         obj.height_img = 240
                         obj_list.object_list.append(obj)
                         display_utils.show_RViz_marker_arr(self.marker_arr_pub, obj_list, DURATION=50)
+                        
 
                     self._action_server.publish_feedback(feedback_msg)
 

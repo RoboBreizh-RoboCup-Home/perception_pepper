@@ -3,7 +3,7 @@
 # import roslib
 import rospy
 from std_msgs.msg import String
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 import Camera.Naoqi_camera as nc
 from Camera.naoqi_camera_types import CameraID, CameraResolution2D as res2D, CameraResolution3D as res3D, ColorSpace2D as cs2D, ColorSpace3D as cs3D
 from cv_bridge import CvBridge
@@ -42,6 +42,8 @@ class HandWavingDetection():
         if self.VISUAL: 
             self.bridge = CvBridge()
             self.pub_opencv = rospy.Publisher('/roboBreizh_detector/hand_waving_image', Image, queue_size=10)
+            self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/hand_waving_compressed_image",
+            CompressedImage,  queue_size=10)
         
         self.initHandWavingDescriptionService()
         
@@ -119,6 +121,14 @@ class HandWavingDetection():
         
         cv_chair_image = self.bridge.cv2_to_imgmsg(chair_image, "bgr8")
         self.pub_opencv.publish(cv_chair_image) 
+    
+        #### Create CompressedIamge ####
+        msg = CompressedImage()
+        msg.header.stamp = rospy.Time.now()
+        msg.format = "jpeg"
+        msg.data = np.array(cv2.imencode('.jpg', cv_image)[1]).tostring()
+        # Publish new image
+        self.pub_compressed_img.publish(msg)
 
 if __name__ == "__main__":
     

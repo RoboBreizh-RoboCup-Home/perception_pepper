@@ -39,16 +39,16 @@ class CategoryDetection():
         self.yolo_detector = YOLOV8(model_name=self.model_name, _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
         
         rospy.loginfo(
-            bcolors.CYAN+"[RoboBreizh - Vision]    Loading Object Detection weights done"+bcolors.ENDC)
+            bcolors.CYAN+"[RoboBreizh - Vision]    Loading Object Detection (Category) weights done"+bcolors.ENDC)
         
         if self.VISUAL: 
             self.bridge = CvBridge()
-            self.pub_opencv = rospy.Publisher('/roboBreizh_detector/object_detection_raw_image', Image, queue_size=10)
+            self.pub_opencv = rospy.Publisher('/roboBreizh_detector/object_category_raw_image', Image, queue_size=10)
             rng = np.random.default_rng(3)
             self.colors = rng.uniform(0, 255, size=(len(self.yolo_detector.classes), 3))
 
-            # self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/object_detection_compressed_image",
-            # CompressedImage,  queue_size=10)
+            self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/object_category_compressed_image",
+            CompressedImage,  queue_size=10)
         
         self.initObjectDescriptionService()
         
@@ -57,7 +57,7 @@ class CategoryDetection():
                         category_detection_service, self.handle_ServicePerceptionCategory)
             
         rospy.loginfo(
-            bcolors.O+"[RoboBreizh - Vision]        Starting Objects Detection. "+bcolors.ENDC)
+            bcolors.O+"[RoboBreizh - Vision]        Starting Objects Detection (Category). "+bcolors.ENDC)
         rospy.spin()
 
     def handle_ServicePerceptionCategory(self, object_detection_service):
@@ -84,6 +84,9 @@ class CategoryDetection():
         # retrieve rgb and depth image from Naoqi camera
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
         detections = self.yolo_detector.inference(ori_rgb_image_320)
+        
+        time_end = time.time()
+        rospy.loginfo("Total time inference: " + str(time_end-time_start))
         
         image_height, image_width = ori_rgb_image_320.shape[0], ori_rgb_image_320.shape[1]
         left_most = ""
@@ -130,8 +133,6 @@ class CategoryDetection():
                     
                     obj_list.object_list.append(obj)
 
-            time_end = time.time()
-            rospy.loginfo("Total time inference: " + str(time_end-time_start))
         else:
             rospy.loginfo(
                 bcolors.R+"[RoboBreizh - Vision]        No Objects Detected. "+bcolors.ENDC)               
@@ -160,24 +161,24 @@ class CategoryDetection():
         ros_image = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
         self.pub_opencv.publish(ros_image) 
         
-        # #### Create CompressedIamge ####
-        # msg = CompressedImage()
-        # msg.header.stamp = rospy.Time.now()
-        # msg.format = "jpeg"
-        # msg.data = np.array(cv2.imencode('.jpg', cv_image)[1]).tostring()
-        # # Publish new image
-        # self.pub_compressed_img.publish(msg)
+        #### Create CompressedIamge ####
+        msg = CompressedImage()
+        msg.header.stamp = rospy.Time.now()
+        msg.format = "jpeg"
+        msg.data = np.array(cv2.imencode('.jpg', cv_image)[1]).tostring()
+        # Publish new image
+        self.pub_compressed_img.publish(msg)
 
 if __name__ == "__main__":
     
     rospy.init_node('category_detection_node', anonymous=True)
     model_name = rospy.get_param('~model_name')
 
-    # VISUAL = rospy.get_param('~visualize')
-    # qi_ip = rospy.get_param('~qi_ip')
+    VISUAL = rospy.get_param('~visualize')
+    qi_ip = rospy.get_param('~qi_ip')
     
-    VISUAL = True
-    qi_ip = "192.168.50.44"
+    # VISUAL = True
+    # qi_ip = "192.168.50.44"
             
     depth_camera_res = res3D.R320x240
     rgb_camera_res = res2D.R320x240
