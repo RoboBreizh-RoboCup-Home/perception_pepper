@@ -45,7 +45,7 @@
 		<node pkg="perception_pepper" type="category_detection_node.py" name="category_detection_node" output="screen">
 			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
-			<param name="model_name" value="robocup"/>
+			<param name="model_name" value="robocup_320"/>
 		</node>
 	</group>
 
@@ -70,7 +70,7 @@
 		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
 			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
-			<param name="model_name" value="robocup"/>
+			<param name="model_name" value="robocup_320"/>
 		</node>
 		<node pkg="perception_pepper" type="person_features_node.py" name="person_feature_detection_node" output="screen">
 			<param name="visualize" value="$(arg visualize)"/>
@@ -105,7 +105,7 @@
 		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
 			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
-			<param name="model_name" value="robocup"/>
+			<param name="model_name" value="robocup_320"/>
 		</node>
 	</group>
 
@@ -134,7 +134,7 @@
 		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
 			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
-			<param name="model_name" value="robocup"/>
+			<param name="model_name" value="robocup_320"/>
 		</node>
 	</group>
 
@@ -142,7 +142,7 @@
 		<node pkg="perception_pepper" type="object_detection_node.py" name="object_detection_node" output="screen">
 			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
-			<param name="model_name" value="robocup"/>
+			<param name="model_name" value="robocup_320"/>
 		</node>
 	</group>
 
