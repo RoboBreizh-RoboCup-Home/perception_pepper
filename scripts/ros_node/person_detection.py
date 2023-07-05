@@ -89,14 +89,16 @@ class PersonDetection():
 
                     person_odom_point = tf_utils.compute_absolute_pose([person_point_x,person_point_y,person_point_z])
                     
-                    # Create Person object
-                    person = Person()
-                    # Person attributes
-                    person.distance = person_dist
-                    person.coord.x = person_odom_point.x
-                    person.coord.y = person_odom_point.y
-                    person.coord.z = person_odom_point.z
-                    person_list.person_list.append(person)
+                    if person_dist <= self.distanceMax:
+                    
+                        # Create Person object
+                        person = Person()
+                        # Person attributes
+                        person.distance = person_dist
+                        person.coord.x = person_odom_point.x
+                        person.coord.y = person_odom_point.y
+                        person.coord.z = person_odom_point.z
+                        person_list.person_list.append(person)
                     
                     if self.VISUAL:
                         cv2.rectangle(ori_rgb_image, (person_start_x, person_start_y), (person_end_x,person_end_y), (255,0,0), 0)
