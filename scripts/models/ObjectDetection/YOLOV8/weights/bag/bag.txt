@@ -1,1 +1,4 @@
-Bag
+basket
+blue_bag
+green_bag
+red_bag

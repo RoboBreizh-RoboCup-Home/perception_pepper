@@ -55,6 +55,8 @@ class BagDetection():
         rospy.spin()
         
     def handle_service(self, bag_detection):
+
+        bag_list = ['basket', 'blue_bag', 'green_bag', 'red_bag']
         
         self.distanceMax = bag_detection.entries_list.distanceMaximum
         obj_list= ObjectList()
@@ -68,7 +70,7 @@ class BagDetection():
         if (len(detections) > 0):
             for i in range(len(detections)):
                 object_name = detections[i]['class_name']
-                if object_name == 'bag':
+                if object_name in bag_list:
                     start_x = round(detections[i]['box'][0])
                     end_x = round((detections[i]['box'][0] + detections[i]['box'][2]))
                     start_y = round(detections[i]['box'][1])
