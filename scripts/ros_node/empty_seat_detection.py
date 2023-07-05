@@ -82,6 +82,10 @@ class EmptySeatDetection():
         arr_empty_chairs = []
 
         ori_rgb_image_320, ori_depth_image = self._cameras.get_image(out_format="cv2")
+        
+        print(ori_rgb_image_320.shape)
+        
+        print(ori_depth_image.shape)
 
         outputs_coco = self.ssd_coco_detector.inference(ori_rgb_image_320, self.objectRequested_list)
 
