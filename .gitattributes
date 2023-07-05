@@ -2,3 +2,5 @@
 *.onnx filter=lfs diff=lfs merge=lfs -text
 *.tflite filter=lfs diff=lfs merge=lfs -text
 *.pb filter=lfs diff=lfs merge=lfs -text
+robocup.onnx  !filter !diff !merge text
+bag_320.onnx  !filter !diff !merge text
