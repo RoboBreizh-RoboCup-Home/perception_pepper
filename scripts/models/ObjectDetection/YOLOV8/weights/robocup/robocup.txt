@@ -1,20 +1,40 @@
+apple
 banana
-bleach
-bottle
+baseball
+bleach_bottle
 bowl
-can
-clip
-cracker box
-drill
-hammer
-jello box
-jug
+cereal_box
+chip_can
+cola_can
+cracker_box
+cricket_ball
+dice
+fork
+gelatin_box
+ice_tea_bottle
+knife
+lemon
+maxwell_house_can
+milk_bottle
 mug
+mustard_bottle
 orange
+orange_juice_box
 peach
 pear
-pitcher
+plate
 plum
+potted_meat_can
+pudding_box
+rubiks_cube
+soccer_ball
+sponge
 spoon
-sugar box
-wine glass
+strawberry
+sugar_box
+tennis_ball
+tomato_soup_can
+tropical_juice_bottle
+tropical_juice_pack
+tuna_can
+wine_bottle
