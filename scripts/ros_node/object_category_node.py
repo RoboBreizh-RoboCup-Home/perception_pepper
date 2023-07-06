@@ -81,7 +81,7 @@ class CategoryDetection():
         RequestObject = ((self.object_requested_list)[0] != '')
         
         # Create Object list
-        obj_list= ObjectList()
+        obj_list = ObjectList()
         obj_list.object_list = []
         
         time_start = time.time()
@@ -113,7 +113,9 @@ class CategoryDetection():
                 dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
                         ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=[ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
 
-                if self.shelf_height[self.shelf][1] < point_z < self.shelf_height[self.shelf][1]:
+                point = [point_x, point_y, point_z]
+                rospy.loginfo(point_x)
+                if float(self.shelf_height[self.shelf][1]) < float(point_z) < float(self.shelf_height[self.shelf][1]):
                     if detections[i]['box'][0] < left_most:
                         left_most = detections[i]['box'][0]
                         left_most_object = i
