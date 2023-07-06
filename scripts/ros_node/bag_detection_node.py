@@ -32,7 +32,7 @@ class BagDetection():
         self.VISUAL = VISUAL
         self._cameras = cameras
         self.distanceMax = 0
-        self.conf_threshold = 0.5
+        self.conf_threshold = 0.6
         self.nms_threshold = 0.5
         self.model_name = model_name
         self.yolo_bag_detector = YOLOV8(model_name=self.model_name,  _conf_threshold=self.conf_threshold, _iou_threshold=self.nms_threshold)
