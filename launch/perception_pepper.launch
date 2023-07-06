@@ -88,6 +88,10 @@
 			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
 		</node>
+		<node pkg="perception_pepper" type="qr_reader_node.py" name="qr_reader_node" output="screen">
+			<param name="visualize" value="$(arg visualize)"/>
+			<param name="qi_ip" value="$(arg qi_ip)"/>
+		</node>
 		<node pkg="perception_pepper" type="gpsr_gesture_node.py" name="gpsr_gesture_detection_node" output="screen">
 			<param name="visualize" value="$(arg visualize)"/>
 			<param name="qi_ip" value="$(arg qi_ip)"/>
