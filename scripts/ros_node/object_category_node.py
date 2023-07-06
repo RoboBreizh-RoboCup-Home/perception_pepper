@@ -29,9 +29,9 @@ class CategoryDetection():
         
         #self.VISUAL :bool = rospy.get_param('~visualize')
 
-        self.shelf_height = {'cabinet1' : [1.06, 0.73],
-                            'cabinet2': [0.73, 0.45], 
-                            'cabinet3': [0.45, 0.1]}
+        self.shelf_height = {'Cabinet1' : [1.06, 0.73],
+                            'Cabinet2': [0.73, 0.45], 
+                            'Cabinet3': [0.45, 0.1]}
         self.VISUAL = VISUAL
         self._cameras = cameras
         self.model_name = model_name
