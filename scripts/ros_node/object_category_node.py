@@ -28,6 +28,10 @@ class CategoryDetection():
     def __init__(self , model_name, cameras: nc.NaoqiCameras, VISUAL) -> None:
         
         #self.VISUAL :bool = rospy.get_param('~visualize')
+
+        self.shelf_height = {'cabinet1' : [1.06, 0.73],
+                            'cabinet2': [0.73, 0.45], 
+                            'cabinet3': [0.45, 0.1]}
         self.VISUAL = VISUAL
         self._cameras = cameras
         self.model_name = model_name
@@ -64,6 +68,7 @@ class CategoryDetection():
         
         objects_Requested = object_detection_service.entries_list
         self.distanceMax = object_detection_service.entries_list.distanceMaximum
+        self.shelf = object_detection_service.shelf_name
         
         for i in range(len(objects_Requested.obj)):
             self.object_requested_list.append((objects_Requested.obj[i].data).lower())
@@ -92,46 +97,62 @@ class CategoryDetection():
         left_most = ""
         right_most = ""
         if (len(detections)>0):
-            left_most, right_most = self.compute_relative_pose(detections)
-            for i in zip(left_most, right_most):
-                object_name = detections[i]['class_name']
+
+            left_most = 10000
+            right_most = 0
+            left_most_object = ""
+            right_most_object = ""
+            for i in range(len(detections)):
+                # Filter everything out of the shelf
 
                 start_x = round(detections[i]['box'][0])
                 end_x = round((detections[i]['box'][0] + detections[i]['box'][2]))
                 start_y = round(detections[i]['box'][1])
                 end_y = round((detections[i]['box'][1] + detections[i]['box'][3]))
-                
-                if self.VISUAL:
-                    size = min([image_height, image_width]) * 0.001
-                    text_thickness = int(min([image_height, image_width]) * 0.001)
-                    color = self.colors[self.yolo_detector.classes.index(object_name)]
-                    cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), color, 0)
-                    cv2.putText(ori_rgb_image_320, object_name, (start_x, start_y),  cv2.FONT_HERSHEY_SIMPLEX, size, (0, 0, 0), text_thickness, cv2.LINE_AA)
-                
-                # Distance Detection
+
                 dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
                         ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=[ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
-                
-                odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
-                
+
+                if self.shelf_height[self.shelf][1] < point_z < self.shelf_height[self.shelf][1]:
+                    if detections[i]['box'][0] < left_most:
+                        left_most = detections[i]['box'][0]
+                        left_most_object = i
+                    if detections[i]['box'][0] > right_most:
+                        right_most = detections[i]['box'][0]
+                        right_most_object = i
+                else:
+                    continue
+
+            for i in zip(left_most_object, right_most_object):
+                object_name = detections[i]['class_name']
+
                 if self.VISUAL:
+                    start_x = round(detections[i]['box'][0])
+                    end_x = round((detections[i]['box'][0] + detections[i]['box'][2]))
+                    start_y = round(detections[i]['box'][1])
+                    end_y = round((detections[i]['box'][1] + detections[i]['box'][3]))
+
                     size = min([image_height, image_width]) * 0.001
                     text_thickness = int(min([image_height, image_width]) * 0.001)
                     color = self.colors[self.yolo_detector.classes.index(object_name)]
                     cv2.rectangle(ori_rgb_image_320, (start_x, start_y), (end_x,end_y), color, 0)
                     cv2.putText(ori_rgb_image_320, object_name, (start_x, start_y),  cv2.FONT_HERSHEY_SIMPLEX, size, (0, 0, 0), text_thickness, cv2.LINE_AA)
-
-                if dist < self.distanceMax:
-                    obj = Object()
-                        
-                    # Chair attributes
-                    obj.label = String(object_name)
-                    obj.distance = dist
-                    obj.coord.x = odom_point.x
-                    obj.coord.y = odom_point.y
-                    obj.coord.z = odom_point.z
+            
                     
-                    obj_list.object_list.append(obj)
+                    # odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
+
+                # if dist < self.distanceMax:
+                obj = Object()
+                    
+                obj.label = String(object_name)
+                obj.distance = 0.0
+                obj.coord.x = 0.0
+                obj.coord.y = 0.0
+                obj.coord.z = 0.0
+                
+                obj_list.object_list.append(obj)
+                else:
+                    continue
 
         else:
             rospy.loginfo(
@@ -148,12 +169,17 @@ class CategoryDetection():
         left_most_object = ""
         right_most_object = ""
         for i in range(len(detections)):
-            if detections[i]['box'][0] < left_most:
-                left_most = detections[i]['box'][0]
-                left_most_object = i
-            if detections[i]['box'][0] > right_most:
-                right_most = detections[i]['box'][0]
-                right_most_object = i
+            # Filter everything out of the shelf
+            dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
+                    ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=[ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
+
+            if self.shelf_height[self.shelf][1] < point_z < self.shelf_height[self.shelf][1]:
+                if detections[i]['box'][0] < left_most:
+                    left_most = detections[i]['box'][0]
+                    left_most_object = i
+                if detections[i]['box'][0] > right_most:
+                    right_most = detections[i]['box'][0]
+                    right_most_object = i
         return left_most_object, right_most_object
     
     def visualiseRVIZ(self, cv_image):
