@@ -57,7 +57,7 @@ class CategoryDetection():
         self.initCategoryDescriptionService()
         
     def initCategoryDescriptionService(self):
-        rospy.Service('/robobreizh/perception_pepper/category_detection',
+        rospy.Service('/robobreizh/perception_pepper/category_detection_service',
                         category_detection_service, self.handle_ServicePerceptionCategory)
             
         rospy.loginfo(
