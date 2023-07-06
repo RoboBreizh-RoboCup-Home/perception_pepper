@@ -54,7 +54,7 @@ class CategoryDetection():
             self.pub_compressed_img = rospy.Publisher("/roboBreizh_detector/object_category_compressed_image",
             CompressedImage,  queue_size=10)
         
-        self.initObjectDescriptionService()
+        self.initCategoryDescriptionService()
         
     def initCategoryDescriptionService(self):
         rospy.Service('/robobreizh/perception_pepper/category_detection',
