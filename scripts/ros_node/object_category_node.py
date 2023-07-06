@@ -68,7 +68,7 @@ class CategoryDetection():
         
         objects_Requested = object_detection_service.entries_list
         self.distanceMax = object_detection_service.entries_list.distanceMaximum
-        self.shelf = object_detection_service.shelf_name.data
+        self.shelf = object_detection_service.shelf_name
         
         for i in range(len(objects_Requested.obj)):
             self.object_requested_list.append((objects_Requested.obj[i].data).lower())
