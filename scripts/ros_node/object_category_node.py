@@ -113,10 +113,12 @@ class CategoryDetection():
                 dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
                         ori_depth_image, start_x, end_y, start_y, end_x, resolutionRGB=[ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
 
-                point = [point_x, point_y, point_z]
-                point_str = str(point_x) + str(point_y) + str(point_z)
+                odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
+
+                point_str = str(odom_point.x) + str(odom_point.y) + str(odom_point.z)
                 rospy.loginfo(point_str)
-                if float(self.shelf_height[str(self.shelf)][1]) < float(point_y) < float(self.shelf_height[str(self.shelf)][1]):
+
+                if float(self.shelf_height[str(self.shelf)][1]) < float(odom_point.z) < float(self.shelf_height[str(self.shelf)][1]):
                     if detections[i]['box'][0] < left_most:
                         left_most = detections[i]['box'][0]
                         left_most_object = i
