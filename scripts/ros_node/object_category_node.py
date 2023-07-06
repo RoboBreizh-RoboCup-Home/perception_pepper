@@ -151,8 +151,6 @@ class CategoryDetection():
                 obj.coord.z = 0.0
                 
                 obj_list.object_list.append(obj)
-                else:
-                    continue
 
         else:
             rospy.loginfo(
