@@ -13,19 +13,20 @@ import qi
 import argparse
 from Naoqi_camera import NaoqiSingleCamera
 
-with open("/home/maelic/Documents/robocup2023/perception_pepper/scripts/models/ObjectDetection/YOLOV8/weights/robocup/robocup.txt", 'r') as f:
-    CLASSES = f.read().splitlines()
-
 import numpy as np
 import cv2
 
-# Create a list of colors for each class where each color is a tuple of 3 integer values
-rng = np.random.default_rng(3)
-colors = rng.uniform(0, 255, size=(len(CLASSES), 3))
 
 class Detector():
-    def __init__(self, model, res):
+    def __init__(self, model, res, classes):
         rospy.init_node('YoloV8', anonymous=True)
+
+        # Load names of classes
+        with open(classes, 'r') as f:
+            self.CLASSES = [line.strip() for line in f.readlines()]
+        # Create a list of colors for each class where each color is a tuple of 3 integer values
+        rng = np.random.default_rng(3)
+        self.colors = rng.uniform(0, 255, size=(len(self.CLASSES), 3))
 
         self.bridge = CvBridge()
         self.res = int(res)
@@ -52,8 +53,8 @@ class Detector():
         # rospy.spin()
 
     def draw_bounding_box_opencv(self, img, class_id, confidence, x, y, x_plus_w, y_plus_h):
-        label = f'{CLASSES[class_id]} ({confidence:.2f})'
-        color = colors[class_id]
+        label = f'{self.CLASSES[class_id]} ({confidence:.2f})'
+        color = self.colors[class_id]
         cv2.rectangle(img, (x, y), (x_plus_w, y_plus_h), color, 2)
         cv2.putText(img, label, (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
         return img
@@ -127,7 +128,7 @@ class Detector():
             box = boxes[index]
             detection = {
                 'class_id': class_ids[index],
-                'class_name': CLASSES[class_ids[index]],
+                'class_name': self.CLASSES[class_ids[index]],
                 'confidence': scores[index],
                 'box': box,
                 'scale': scale}
@@ -157,9 +158,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, default='yolov8n_ycb.onnx', help='model path')
     parser.add_argument('--res', type=str, default='320', help='resolution')
+    parser.add_argument('--classes', type=str, default='robocup.txt', help='classes txt file')
 
     args = parser.parse_args()
     model = args.model
     res = args.res
+    classes = args.classes
     print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
-    Detector(model, res)
+    Detector(model, res, classes)
