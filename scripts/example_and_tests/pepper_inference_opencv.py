@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 from cv_bridge import CvBridge
 import rospy
-import message_filters
 from PIL import Image
 from sensor_msgs.msg import Image as Image2
 
@@ -12,14 +11,13 @@ import cv2
 import qi 
 
 import argparse
-from Naoqi_camera import NaoqiCamera
+from Naoqi_camera import NaoqiSingleCamera
 
-with open("/home/robobreizh/Documents/perception_pepper/scripts/models/ObjectDetection/YOLOV8/weights/robocup/robocup.txt", 'r') as f:
+with open("/home/maelic/Documents/robocup2023/perception_pepper/scripts/models/ObjectDetection/YOLOV8/weights/robocup/robocup.txt", 'r') as f:
     CLASSES = f.read().splitlines()
 
 import numpy as np
 import cv2
-
 
 # Create a list of colors for each class where each color is a tuple of 3 integer values
 rng = np.random.default_rng(3)
@@ -37,7 +35,7 @@ class Detector():
         self.conf_threshold = 0.3
         self.iou_threshold = 0.5
 
-        self.cam = NaoqiCamera(res, "top")
+        self.cam = NaoqiSingleCamera(ip="192.168.0.103")
 
         self.model = model
         
@@ -60,6 +58,14 @@ class Detector():
         cv2.putText(img, label, (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
         return img
 
+    def xywh2xyxy(x):
+        # Convert bounding box (x, y, w, h) to bounding box (x1, y1, x2, y2)
+        y = np.copy(x)
+        y[..., 0] = x[..., 0] - x[..., 2] / 2
+        y[..., 1] = x[..., 1] - x[..., 3] / 2
+        y[..., 2] = x[..., 0] + x[..., 2] / 2
+        y[..., 3] = x[..., 1] + x[..., 3] / 2
+        return y
 
     def extract_boxes(self, predictions, original_shape, input_height, input_width):
         # Extract boxes from predictions
@@ -69,7 +75,7 @@ class Detector():
         boxes = self.rescale_boxes(boxes, original_shape, input_height, input_width)
 
         # Convert boxes to xyxy format
-        boxes = xywh2xyxy(boxes)
+        boxes = self.xywh2xyxy(boxes)
 
         return boxes
 
@@ -126,7 +132,7 @@ class Detector():
                 'box': box,
                 'scale': scale}
             detections.append(detection)
-            img = draw_bounding_box_opencv(orig_image, class_ids[index], scores[index], round(box[0] * scale), round(box[1] * scale),
+            img = self.draw_bounding_box_opencv(orig_image, class_ids[index], scores[index], round(box[0] * scale), round(box[1] * scale),
                             round((box[0] + box[2]) * scale), round((box[1] + box[3]) * scale))
 
         time_2=time.time()
@@ -136,30 +142,21 @@ class Detector():
 
     def image_callback(self, use_tflite):
         frame = self.cam.get_image('cv2')
-        
-        if use_tflite is False:
-            onnx_out = self.detect_onnx(frame)
-            print("##############################")
-            opencv_out = self.detect_opencv(frame, self.res)
-            print("##############################")
+    
+        print("##############################")
+        opencv_out = self.detect_opencv(frame, self.res)
+        print("##############################")
 
-            ros_image_yolo_cv = self.bridge.cv2_to_imgmsg(opencv_out, "rgb8")
+        ros_image_yolo_cv = self.bridge.cv2_to_imgmsg(opencv_out, "rgb8")
 
-            self.pub_cv2.publish(ros_image_yolo_cv)
-        
-            ros_image_yolo_onnx = self.bridge.cv2_to_imgmsg(onnx_out, "rgb8")
-            self.pub_onnx.publish(ros_image_yolo_onnx)
-        else:
-            tflite_out = self.detect_tflite(frame)
-            ros_image_yolo_tflite = self.bridge.cv2_to_imgmsg(tflite_out, "rgb8")
-            self.pub_tflite.publish(ros_image_yolo_tflite)
+        self.pub_cv2.publish(ros_image_yolo_cv)
 
 
 if __name__ == '__main__':
     # get arg 1 and 2
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, default='yolov8n_ycb.onnx', help='model path')
-    parser.add_argument('--res', type=str, default='640', help='resolution')
+    parser.add_argument('--res', type=str, default='320', help='resolution')
 
     args = parser.parse_args()
     model = args.model
