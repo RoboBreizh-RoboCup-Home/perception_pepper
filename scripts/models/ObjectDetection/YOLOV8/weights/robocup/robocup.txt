@@ -1,40 +1,40 @@
 apple
 banana
 baseball
-bleach_bottle
+cleanser
 bowl
-cereal_box
-chip_can
-cola_can
-cracker_box
-cricket_ball
+cornflakes
+pringles
+cola
+cheezit
+cricket ball
 dice
 fork
-gelatin_box
-ice_tea_bottle
+strawberry jello
+iced tea
 knife
 lemon
-maxwell_house_can
-milk_bottle
-mug
-mustard_bottle
+coffee grounds
+milk
+cup
+mustard
 orange
-orange_juice_box
+orange juice
 peach
 pear
 plate
 plum
-potted_meat_can
-pudding_box
-rubiks_cube
-soccer_ball
+spam
+chocolate jello
+rubiks cube
+soccer ball
 sponge
 spoon
 strawberry
-sugar_box
-tennis_ball
-tomato_soup_can
-tropical_juice_bottle
-tropical_juice_pack
-tuna_can
-wine_bottle
+sugar
+tennis ball
+tomato soup
+tropical juice
+juice pack
+tuna
+red wine
