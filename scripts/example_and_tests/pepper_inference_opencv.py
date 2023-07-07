@@ -11,13 +11,19 @@ from sensor_msgs.msg import Image as Image2
 import cv2
 import qi 
 
-from yolov8 import YOLOv8
-from yolov8.utils import draw_bounding_box_opencv
-from yolov8.utils import class_names as CLASSES
 import argparse
 from Naoqi_camera import NaoqiCamera
-from tflite_runtime.interpreter import Interpreter
-from yolov8.utils import xywh2xyxy, nms, draw_detections
+
+with open("/home/robobreizh/Documents/perception_pepper/scripts/models/ObjectDetection/YOLOV8/weights/robocup/robocup.txt", 'r') as f:
+    CLASSES = f.read().splitlines()
+
+import numpy as np
+import cv2
+
+
+# Create a list of colors for each class where each color is a tuple of 3 integer values
+rng = np.random.default_rng(3)
+colors = rng.uniform(0, 255, size=(len(CLASSES), 3))
 
 class Detector():
     def __init__(self, model, res):
@@ -26,33 +32,20 @@ class Detector():
         self.bridge = CvBridge()
         self.res = int(res)
         self.session = qi.Session()
-        self.session.connect("tcp://127.0.0.1:9559")
+        self.session.connect("tcp://192.168.0.103:9559")
 
         self.conf_threshold = 0.3
         self.iou_threshold = 0.5
 
         self.cam = NaoqiCamera(res, "top")
 
-        self.model = "./models/yolov8/"+model
+        self.model = model
         
+        self.cv2_detector = cv2.dnn.readNetFromONNX(self.model)
 
-        if "tflite" in model:
-            self.tflit_detector = self.init_tflite(self.model)
-            self.pub_tflite = rospy.Publisher(
-                'yolov8_detector_tflite', Image2, queue_size=1)
-            use_tflite= True
-        else:
-            self.yolov8_detector = YOLOv8(conf_thres=self.conf_threshold, iou_thres=self.iou_threshold)
-
-            self.cv2_detector = cv2.dnn.readNetFromONNX(self.model)
-            self.yolov8_detector.initialize_model(self.model)
-        
-            self.pub_onnx = rospy.Publisher(
-                    'yolov8_detector_onnx', Image2, queue_size=1)
-
-            self.pub_cv2 = rospy.Publisher(
-                    'yolov8_detector_cv', Image2, queue_size=1)
-            use_tflite= False
+        self.pub_cv2 = rospy.Publisher(
+                'yolov8_detector_cv', Image2, queue_size=1)
+        use_tflite= False
 
         # spin
         print("Waiting for image topics...")
@@ -60,10 +53,13 @@ class Detector():
             self.image_callback(use_tflite)
         # rospy.spin()
 
-    def init_tflite(self, model):
-        # Load the TFLite model and allocate tensors.
-        self.tflite_interpreter = Interpreter(model_path=model)
-        self.tflite_interpreter.allocate_tensors()
+    def draw_bounding_box_opencv(self, img, class_id, confidence, x, y, x_plus_w, y_plus_h):
+        label = f'{CLASSES[class_id]} ({confidence:.2f})'
+        color = colors[class_id]
+        cv2.rectangle(img, (x, y), (x_plus_w, y_plus_h), color, 2)
+        cv2.putText(img, label, (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+        return img
+
 
     def extract_boxes(self, predictions, original_shape, input_height, input_width):
         # Extract boxes from predictions
@@ -85,87 +81,6 @@ class Detector():
         boxes *= np.array([img_width, img_height, img_width, img_height])
         return boxes
     
-    def detect_tflite(self, image):
-        time_1 = time.time()
-        [height, width, _] = image.shape
-        length = max((height, width))
-        scale = length / self.res
-
-        # Get input and output tensors.
-        self.input_details = self.tflite_interpreter.get_input_details()
-        self._input_type = self.input_details[0]['dtype']
-        self.output_details = self.tflite_interpreter.get_output_details()
-
-        input_height =  self.tflite_interpreter.get_input_details()[0]['shape'][1]
-        input_width =  self.tflite_interpreter.get_input_details()[0]['shape'][2]
-
-        # Resize and pad the image to keep the aspect ratio and fit the expected size.
-      
-        input_img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-        # Resize input image
-        input_img = cv2.resize(input_img, (input_width, input_height))
-
-        # Scale input pixel values to 0 to 1
-        input_img = input_img / 255.0
-        input_img = input_img.transpose(2, 0, 1)
-        input_tensor = input_img[np.newaxis, :, :, :].astype(np.float32)
-
-        self.tflite_interpreter.allocate_tensors()
-
-        # Run inference 
-        self.tflite_interpreter.set_tensor(self.input_details[0]['index'],
-                                    input_tensor.astype(self._input_type))
-        self.tflite_interpreter.invoke()
-
-        # The function `get_tensor()` returns a copy of the tensor data.
-        # Use `tensor()` in order to get a pointer to the tensor.
-        outputs = self.tflite_interpreter.get_tensor(self.output_details[0]['index'])
-
-        predictions = np.squeeze(outputs[0]).T
-
-        scores = np.max(predictions[:, 4:], axis=1)
-        predictions = predictions[scores > self.conf_threshold, :]
-        scores = scores[scores > self.conf_threshold]
-
-        if len(scores) == 0:
-            return [], [], []
-
-        # Get the class with the highest confidence
-        class_ids = np.argmax(predictions[:, 4:], axis=1)
-
-        # Get bounding boxes for each object
-        boxes = self.extract_boxes(predictions, original_shape=(height, width), input_height=input_height, input_width=input_width)
-
-        # Apply non-maxima suppression to suppress weak, overlapping bounding boxes
-        indices = nms(boxes, scores, self.iou_threshold)
-        boxes = boxes[indices]
-        scores = scores[indices]
-        class_ids = class_ids[indices]
-        mask_alpha = 0.4
-
-        img=draw_detections(image, boxes, scores, class_ids, mask_alpha)
-        
-        time_2=time.time()
-
-        print("Detected class ids: ", class_ids)
-        print("Detection time TfLite:", time_2 - time_1)
-        print("Object detected TfLite: ", len(boxes))
-
-        return img
-    
-    def detect_onnx(self, image):
-        time_1 = time.time()
-
-        boxes, scores, class_ids = self.yolov8_detector(image)
-
-        combined_img = self.yolov8_detector.draw_detections(image)
-        time_2=time.time()
-        print("Detected class ids: ", class_ids)
-        print("Detection time ONNX:", time_2 - time_1)
-        print("Object detected ONNX: ", len(boxes))
-
-        return combined_img
 
     def detect_opencv(self, orig_image, res):
         time_1 = time.time()
