@@ -18,7 +18,7 @@ import cv2
 
 
 class Detector():
-    def __init__(self, model, res, classes):
+    def __init__(self, model, res, classes, ip):
         rospy.init_node('YoloV8', anonymous=True)
 
         # Load names of classes
@@ -31,12 +31,13 @@ class Detector():
         self.bridge = CvBridge()
         self.res = int(res)
         self.session = qi.Session()
-        self.session.connect("tcp://192.168.0.103:9559")
+        self.ip = ip
+        self.session.connect(f"tcp://{self.ip}:9559")
 
         self.conf_threshold = 0.3
         self.iou_threshold = 0.5
 
-        self.cam = NaoqiSingleCamera(ip="192.168.0.103")
+        self.cam = NaoqiSingleCamera(ip=self.ip)
 
         self.model = model
         
@@ -159,10 +160,14 @@ if __name__ == '__main__':
     parser.add_argument('--model', type=str, default='yolov8n_ycb.onnx', help='model path')
     parser.add_argument('--res', type=str, default='320', help='resolution')
     parser.add_argument('--classes', type=str, default='robocup.txt', help='classes txt file')
+    parser.add_argument('--ip', type=str, default='127.0.0.1', help='IP robot')
+
 
     args = parser.parse_args()
     model = args.model
     res = args.res
     classes = args.classes
+    ip = args.ip
+
     print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
-    Detector(model, res, classes)
+    Detector(model, res, classes, ip)
