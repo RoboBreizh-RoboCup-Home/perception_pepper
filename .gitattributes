@@ -4,3 +4,4 @@
 *.pb filter=lfs diff=lfs merge=lfs -text
 robocup.onnx  !filter !diff !merge text
 bag_320.onnx  !filter !diff !merge text
+demo_indoorVG.onnx  !filter !diff !merge text
