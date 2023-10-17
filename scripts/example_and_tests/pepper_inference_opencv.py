@@ -3,9 +3,12 @@ import time
 import cv2
 import numpy as np
 from cv_bridge import CvBridge
-import rospy
+# change to ros2
+import rclpy
+from rclpy.node import Node
+
 from PIL import Image
-from sensor_msgs.msg import Image as Image2
+from sensor_msgs.msg import Image
 
 import cv2
 import qi 
@@ -17,9 +20,9 @@ import numpy as np
 import cv2
 
 
-class Detector():
+class Detector(Node):
     def __init__(self, model, res, classes, ip):
-        rospy.init_node('YoloV8', anonymous=True)
+        super().__init__('YoloV8')
 
         # Load names of classes
         with open(classes, 'r') as f:
@@ -43,15 +46,10 @@ class Detector():
         
         self.cv2_detector = cv2.dnn.readNetFromONNX(self.model)
 
-        self.pub_cv2 = rospy.Publisher(
-                'yolov8_detector_cv', Image2, queue_size=1)
-        use_tflite= False
+        self.pub_cv2 = self.create_publisher(Image, 'yolov8_detector_cv', 10)
 
         # spin
-        print("Waiting for image topics...")
-        while not rospy.is_shutdown():
-            self.image_callback(use_tflite)
-        # rospy.spin()
+        print("YOLO node started")
 
     def draw_bounding_box_opencv(self, img, class_id, confidence, x, y, x_plus_w, y_plus_h):
         label = f'{self.CLASSES[class_id]} ({confidence:.2f})'
@@ -142,7 +140,7 @@ class Detector():
         print("Object detected OPENCV: ", len(detections))
         return img
 
-    def image_callback(self, use_tflite):
+    def image_callback(self):
         frame = self.cam.get_image('cv2')
     
         print("##############################")
@@ -157,9 +155,9 @@ class Detector():
 if __name__ == '__main__':
     # get arg 1 and 2
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str, default='yolov8n_ycb.onnx', help='model path')
+    parser.add_argument('--model', type=str, default='demo_indoorVG.onnx', help='model path')
     parser.add_argument('--res', type=str, default='320', help='resolution')
-    parser.add_argument('--classes', type=str, default='robocup.txt', help='classes txt file')
+    parser.add_argument('--classes', type=str, default='classes.txt', help='classes txt file')
     parser.add_argument('--ip', type=str, default='127.0.0.1', help='IP robot')
 
 
@@ -171,3 +169,5 @@ if __name__ == '__main__':
 
     print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
     Detector(model, res, classes, ip)
+    Detector.image_callback()
+    #rclpy.spin(node)

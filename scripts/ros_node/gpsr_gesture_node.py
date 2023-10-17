@@ -168,11 +168,8 @@ if __name__ == "__main__":
     
     rospy.init_node('gpsr_gesture_node', anonymous=True)
 
-    # VISUAL = rospy.get_param('~visualize')
-    # qi_ip = rospy.get_param('~qi_ip')
-    
-    VISUAL = True
-    qi_ip = "192.168.50.44"
+    VISUAL = rospy.get_param('~visualize')
+    qi_ip = rospy.get_param('~qi_ip')
             
     depth_camera_res = res3D.R320x240
     rgb_camera_res = res2D.R320x240
