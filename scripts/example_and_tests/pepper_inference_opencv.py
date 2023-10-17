@@ -153,19 +153,23 @@ class Detector(Node):
 
 
 def main(args=None):
+    rclpy.init(args=sys.argv)
+
+    BASE_PATH = '/home/nao/catkin_ros2/src/perception_pepper/'
+
     # get arg 1 and 2
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str, default='demo_indoorVG.onnx', help='model path')
-    parser.add_argument('--res', type=str, default='320', help='resolution')
-    parser.add_argument('--classes', type=str, default='classes.txt', help='classes txt file')
-    parser.add_argument('--ip', type=str, default='127.0.0.1', help='IP robot')
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('--model', type=str, default='demo_indoorVG.onnx', help='model path')
+    # parser.add_argument('--res', type=str, default='320', help='resolution')
+    # parser.add_argument('--classes', type=str, default='classes.txt', help='classes txt file')
+    # parser.add_argument('--ip', type=str, default='127.0.0.1', help='IP robot')
 
 
-    args = parser.parse_args()
-    model = args.model
-    res = args.res
-    classes = args.classes
-    ip = args.ip
+    # args = parser.parse_args()
+    model = BASE_PATH+'scripts/example_and_tests/demo_indoorVG.onnx'
+    res = '320'
+    classes = BASE_PATH+'scripts/example_and_tests/classes.txt'
+    ip = '127.0.0.1'
 
     print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
     Detector(model, res, classes, ip)
