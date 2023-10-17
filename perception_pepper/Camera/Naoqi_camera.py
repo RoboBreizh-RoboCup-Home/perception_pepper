@@ -1,4 +1,3 @@
-
 import cv2
 import numpy as np
 from PIL import Image as ImagePIL
@@ -7,10 +6,12 @@ from cv_bridge import CvBridge
 
 import cv2
 import qi
-import rospy
+import rclpy
+from rclpy.time import Time
+
 from typing import Union, List
 
-from Camera.naoqi_camera_types import CameraID, CameraResolution2D as res2D, CameraResolution3D as res3D, ColorSpace2D as cs2D, ColorSpace3D as cs3D
+from perception_pepper.Camera.naoqi_camera_types import CameraID, CameraResolution2D as res2D, CameraResolution3D as res3D, ColorSpace2D as cs2D, ColorSpace3D as cs3D
 
 
 class NaoqiCamera():
@@ -28,7 +29,7 @@ class NaoqiCamera():
             raise f'The camera {camera_id} does not support resolution {resolution}'
 
         # make sure resolution and camera id match
-        assert isinstance(resolution, res2D) and camera_id != CameraID.DEPTH or isinstance(resolution, res3D) and camera_id == CameraID.DEPTH, f'The resolution {resolution} and camera {camera_id} are not compatible'
+        assert isinstance(resolution, res2D) and camera_id != CameraID.DEPTH or isinstance(resolution, res3D) and camera_id != CameraID.DEPTH, f'The resolution {resolution} and camera {camera_id} are not compatible'
         self.camera = camera_id
         # make sure if resolution is type res2D then colorspace is cs2D
         # or is type res3D then colorspace is cs3D
@@ -40,16 +41,13 @@ class NaoqiCamera():
         # Settinf up fps
         if self.camera == CameraID.DEPTH:
             if fps > 20:
-                rospy.logdebug("FPS too high for 3D camera, using default max fps 20")
                 self.fps = 20
             else:
                 self.fps = fps
         else:
             if fps > 30:
-                rospy.logdebug("FPS too high for 2D camera, using default 30")
                 self.fps = 30
             elif self.resolution == 3 or self.resolution == 4 and fps > 1:
-                rospy.logdebug("FPS too high for 2D camera, using default 1")
                 self.fps = 1
             else:
                 self.fps = fps
@@ -63,40 +61,35 @@ class NaoqiCamera():
 
 class NaoqiSingleCamera(NaoqiCamera):
     # default cam top RGB at 30 fps
-    def __init__(self, resolution: Union[res2D,res3D]= res2D.R640x480, camera_id: CameraID = CameraID.TOP, fps: int = 30, color_space: Union[cs2D, cs3D] = cs2D.RGBColorSpace, ip: str = "127.0.0.1"):
+    def __init__(self, resolution: res2D=res2D.R640x480, camera_id: CameraID = CameraID.TOP, fps: int = 30, color_space: cs2D= cs2D.RGBColorSpace, ip: str = "127.0.0.1"):
         super().__init__(resolution, camera_id, fps, color_space)
-
         self.session = qi.Session()
-        self.session.connect(f"tcp://{ip}:9559")
+        self.session.connect("tcp://"+ip+":9559")
+
         self.video_service = self.session.service("ALVideoDevice")
-        self.videosClient = self.video_service.subscribeCameras(
-            "cameras_pepper", self.camera.value, self.resolution.value, self.color_space.value, fps)
-        rospy.on_shutdown(self.cleanup)
+        self.videosClient = self.video_service.subscribeCamera("camera_pepper", self.camera.value, self.resolution.value, self.color_space.value, fps)
 
     def get_image(self, out_format='cv2')->List:
         """
         Input: out_format: 'cv2' or 'PIL'
         Returns a list of images, one for each camera subscribed depending on the out_format.
         """
-        [raw_rgb_images, raw_depth_images] = self.video_service.getImagesRemote(self.videosClient)  # return array of images
+        raw_rgb_image = self.video_service.getImageRemote(self.videosClient)  # return array of images
 
         if out_format == 'PIL':
             # Get the image size and pixel array.
-            imageWidth = raw_rgb_images[0]
-            imageHeight = raw_rgb_images[1]
-            array = raw_rgb_images[6]
+            imageWidth = raw_rgb_image[0]
+            imageHeight = raw_rgb_image[1]
+            array = raw_rgb_image[6]
             image_string = str(bytearray(array))
             # Create a PIL Image from our pixel array.
-            rgb_image_pil = ImagePIL.fromstring("RGB", (imageWidth, imageHeight), image_string)
+            rgb_image = ImagePIL.fromstring("RGB", (imageWidth, imageHeight), image_string)
             
         elif out_format == 'cv2':
-            rgb_image_cv2 = np.frombuffer(raw_rgb_images[6], np.uint8).reshape(raw_rgb_images[1], raw_rgb_images[0], 3)
-            depth_image_cv2 = np.frombuffer(raw_depth_images[6], np.uint8).reshape(raw_depth_images[1], raw_depth_images[0], 2)
-
-        return rgb_image_cv2, depth_image_cv2
+            rgb_image = np.frombuffer(raw_rgb_image[6], np.uint8).reshape(raw_rgb_image[1], raw_rgb_image[0], 3)
+        return rgb_image
 
     def cleanup(self):
-        rospy.loginfo("Cleaning up NaoqiSingle2DCamera subscriber...")
         self.video_service.unsubscribe(self.videosClient)
         self.session.close()
 
@@ -131,22 +124,17 @@ class NaoqiCameras():
                 fps = self.cameras[i].fps
                 
         self.videosClient = self.video_service.subscribeCameras( "cameras_pepper", [((self.cameras_id)[0].value), ((self.cameras_id)[1].value)], [self.cameras_res[0].value,self.cameras_res[1].value], [self.cameras_color_space[0].value,self.cameras_color_space[1].value], fps)
-        rospy.on_shutdown(self.cleanup)
 
     def convertImage3DPepperToCV(self, pepperImageD):
         kDepthColorSpace = 17
         encoding = ""
         img = Image()
-        img.header.stamp = rospy.Time.now()
         img.header.frame_id = "camera_depth_frame"
         img.height = pepperImageD[1]
         img.width = pepperImageD[0]
         nbLayers = pepperImageD[2]
         if pepperImageD[3] == kDepthColorSpace:
             encoding = "mono16"
-        else:
-            rospy.logerr(
-                "Received unknown encoding: {0}".format(pepperImageD[3]))
         img.encoding = encoding
         img.step = img.width * nbLayers
         img.data = pepperImageD[6]
@@ -256,4 +244,3 @@ class NaoqiCameras():
 # AL::kQQQQVGA	from 1 to 20 fps
 # AL::kQQQVGA	from 1 to 20 fps
 # AL::kQQVGA	from 1 to 20 fps
-# AL::kQVGA	    from 1 to 20 fps

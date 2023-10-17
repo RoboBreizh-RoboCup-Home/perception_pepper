@@ -13,10 +13,11 @@
 # limitations under the License.
 """Module contains pose tracker implementations."""
 
-from models.PoseDetection.bounding_box_tracker import BoundingBoxTracker
-from models.PoseDetection.config import KeypointTrackerConfig
-from models.PoseDetection.config import TrackerConfig
-from models.PoseDetection.keypoint_tracker import KeypointTracker
-from models.PoseDetection.tracker import Track
-from models.PoseDetection.tracker import Tracker
-from models.PoseDetection.roboBreizh_Utils_pose import visualize
+from .bounding_box_tracker import BoundingBoxTracker
+from .config import KeypointTrackerConfig
+from .config import TrackerConfig
+from .keypoint_tracker import KeypointTracker
+from .tracker import Track
+from .tracker import Tracker
+from .roboBreizh_Utils_pose import visualize
+from .MoveNet_MultiPose.movenet_multipose import MoveNetMultiPose
