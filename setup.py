@@ -19,8 +19,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'yolo_demo = scripts.example_and_tests.pepper_inference_opencv:main',
-            'pose_demo = scripts.example_and_tests.demo_pose:main',
+            'yolo_demo = perception_pepper.example_and_tests.pepper_inference_opencv:main',
+            'pose_demo = perception_pepper.example_and_tests.demo_pose:main',
         ],
     },
 )
