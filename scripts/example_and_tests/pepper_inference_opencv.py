@@ -14,7 +14,7 @@ import cv2
 import qi 
 
 import argparse
-from Naoqi_camera import NaoqiSingleCamera
+from .Naoqi_camera import NaoqiSingleCamera
 
 import numpy as np
 import cv2
