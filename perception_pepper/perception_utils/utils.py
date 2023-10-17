@@ -5,10 +5,11 @@
 # ---------------------------------------------------------------------------
 
 
-import rospkg
-
+import os
 
 def get_pkg_path():
-    rp = rospkg.RosPack()
-    return(rp.get_path('perception_pepper'))
+    # get current path of this script
+    current_path = os.path.dirname(os.path.realpath(__file__))
+    current_path = os.path.join(current_path, '../..')
+    return(current_path)
     
