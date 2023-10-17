@@ -16,6 +16,8 @@ class PoseDemo(Node):
     def __init__(self, qi_ip):
         super().__init__('PoseDemo')
 
+        self.ip = qi_ip
+
         self.pose_model = MoveNetMultiPose(pose_model_name="movenet_multipose")
     
         self.cam = NaoqiSingleCamera(ip=self.ip)
