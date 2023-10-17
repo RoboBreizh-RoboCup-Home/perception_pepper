@@ -6,7 +6,7 @@ from perception_pepper.models.PoseDetection import visualize
 
 from perception_pepper.Camera import NaoqiSingleCamera
 import time
-
+import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
@@ -55,6 +55,7 @@ def main():
     # res = args.res
     # classes = args.classes
     # ip = args.ip
+    rclpy.init()
 
     # print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
     PoseDemo('127.0.0.1')
