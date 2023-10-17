@@ -20,7 +20,7 @@ setup(
     entry_points={
         'console_scripts': [
             'yolo_demo = scripts.example_and_tests.pepper_inference_opencv:main',
-            'pose_demo = scripts.example_and_tests.pose_demo:main',
+            'pose_demo = scripts.example_and_tests.demo_pose:main',
         ],
     },
 )
