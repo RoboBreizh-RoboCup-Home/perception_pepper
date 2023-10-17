@@ -1,8 +1,8 @@
 
 # create ROS2 node PoseDemo
 
-from .PoseDetection.MoveNet_MultiPose.movenet_multipose import MoveNetMultiPose
-from .PoseDetection import visualize
+from PoseDetection.MoveNet_MultiPose.movenet_multipose import MoveNetMultiPose
+from PoseDetection import visualize
 
 from .Naoqi_camera import NaoqiSingleCamera
 from Camera.naoqi_camera_types import CameraID, CameraResolution2D as res2D, CameraResolution3D as res3D, ColorSpace2D as cs2D, ColorSpace3D as cs3D
