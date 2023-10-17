@@ -6,7 +6,7 @@ package_name = 'perception_pepper'
 setup(
     name=package_name,
     version='0.0.0',
-    packages=find_packages(exclude=['test']),
+    packages=['PoseDetection', 'ObjectDetection', 'FaceDetection', 'AgeGenderDetection', 'ColourDetection', 'GlassesDetection', 'example_and_tests', 'ros_node'],
     data_files=[
         ('share/' + package_name, ['package.xml']),
     ],
