@@ -18,9 +18,10 @@ from typing import List, Tuple
 import tf2_geometry_msgs
 from geometry_msgs.msg import Point32, PointStamped
 import tf2_ros
-import rospy
 import cv2
 from perception_pepper.models.PoseDetection.roboBreizh_Data_pose import PersonPose
+import rclpy
+from rclpy.duration import Duration
 
 import numpy as np
 
@@ -135,12 +136,16 @@ def transform_point(transformation, point_wrt_source):
     return [point_wrt_target.x, point_wrt_target.y, point_wrt_target.z]
 
 def get_transformation(tf_buffer , source_frame, target_frame):
+    rclpy.init()
+    duration = Duration(seconds=0.5)
+
     # get the tf at first available time
     try:
-        transformation = tf_buffer.lookup_transform(target_frame, source_frame, rospy.Time(0), rospy.Duration(0.5))
+        transformation = tf_buffer.lookup_transform(target_frame, source_frame, rclpy.time.Time() , duration)
     except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
         rospy.logerr('Unable to find the transformation from %s to %s'
                         % source_frame, target_frame)
+    rclpy.shutdown()
     return transformation
 
 def compute_absolute_pose(tf_buffer, pose):
