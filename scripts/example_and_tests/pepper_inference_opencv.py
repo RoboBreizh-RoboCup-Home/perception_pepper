@@ -18,7 +18,7 @@ from .Naoqi_camera import NaoqiSingleCamera
 
 import numpy as np
 import cv2
-
+import sys
 
 class Detector(Node):
     def __init__(self, model, res, classes, ip):
@@ -152,7 +152,7 @@ class Detector(Node):
         self.pub_cv2.publish(ros_image_yolo_cv)
 
 
-if __name__ == '__main__':
+def main(args=None):
     # get arg 1 and 2
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, default='demo_indoorVG.onnx', help='model path')
@@ -171,3 +171,6 @@ if __name__ == '__main__':
     Detector(model, res, classes, ip)
     Detector.image_callback()
     #rclpy.spin(node)
+
+if __name__ == '__main__':
+    main(args=sys.argv[1:])
