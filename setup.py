@@ -3,7 +3,6 @@ import os
 
 package_name = 'perception_pepper'
 
-
 setup(
     name=package_name,
     version='0.0.0',
@@ -20,8 +19,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'yolo_demo = example_and_tests.pepper_inference_opencv:main',
-            'pose_demo = example_and_tests.pose_demo:main',
+            'yolo_demo = scripts.example_and_tests.pepper_inference_opencv:main',
+            'pose_demo = scripts.example_and_tests.pose_demo:main',
         ],
     },
 )
