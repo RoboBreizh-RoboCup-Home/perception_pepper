@@ -40,7 +40,7 @@ class PoseDemo(Node):
 
     def inference(self, rgb_image):
         list_person = self.pose_model.inference(rgb_image)
-        return visualize(list_person)
+        return visualize(rgb_image, list_person)
 
 def main():
     # get arg 1 and 2
@@ -61,7 +61,13 @@ def main():
 
     # print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
     pose_detector = PoseDemo('127.0.0.1')
-    pose_detector.image_callback()
+
+    while rclpy.ok():
+    # Your code here
+        pose_detector.image_callback()
+    # Clean up when finished
+    pose_detector.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

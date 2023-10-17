@@ -171,8 +171,15 @@ def main(args=None):
     ip = '127.0.0.1'
 
     print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
-    Detector(model, res, classes, ip)
-    Detector.image_callback()
+    detector_node = Detector(model, res, classes, ip)
+    
+    while rclpy.ok():
+    # Your code here
+        detector_node.image_callback()
+    # Clean up when finished
+    detector_node.destroy_node()
+    rclpy.shutdown()
+
     #rclpy.spin(node)
 
 if __name__ == '__main__':
