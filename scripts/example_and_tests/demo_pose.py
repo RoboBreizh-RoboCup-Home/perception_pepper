@@ -59,6 +59,7 @@ def main():
 
     # print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
     PoseDemo('127.0.0.1')
+    PoseDemo.image_callback()
 
 if __name__ == '__main__':
     main()
