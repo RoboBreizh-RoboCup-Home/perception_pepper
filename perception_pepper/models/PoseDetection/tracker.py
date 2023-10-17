@@ -16,8 +16,8 @@
 import abc
 from typing import List, NamedTuple
 
-from models.PoseDetection.roboBreizh_Data_pose import PersonPose
-from models.PoseDetection.config import TrackerConfig
+from perception_pepper.models.PoseDetection.roboBreizh_Data_pose import PersonPose
+from perception_pepper.models.PoseDetection.config import TrackerConfig
 
 
 class Track(NamedTuple):

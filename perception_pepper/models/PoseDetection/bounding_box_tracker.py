@@ -15,9 +15,9 @@
 
 from typing import List
 
-from models.PoseDetection.roboBreizh_Data_pose import PersonPose
-from models.PoseDetection.tracker import Track
-from models.PoseDetection.tracker import Tracker
+from perception_pepper.models.PoseDetection.roboBreizh_Data_pose import PersonPose
+from perception_pepper.models.PoseDetection.tracker import Track
+from perception_pepper.models.PoseDetection.tracker import Tracker
 
 
 class BoundingBoxTracker(Tracker):

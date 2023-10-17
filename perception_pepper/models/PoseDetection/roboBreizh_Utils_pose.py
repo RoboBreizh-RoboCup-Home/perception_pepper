@@ -20,7 +20,7 @@ from geometry_msgs.msg import Point32, PointStamped
 import tf2_ros
 import rospy
 import cv2
-from models.PoseDetection.roboBreizh_Data_pose import PersonPose
+from perception_pepper.models.PoseDetection.roboBreizh_Data_pose import PersonPose
 
 import numpy as np
 
