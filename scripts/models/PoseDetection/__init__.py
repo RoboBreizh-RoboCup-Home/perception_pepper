@@ -19,3 +19,4 @@ from models.PoseDetection.config import TrackerConfig
 from models.PoseDetection.keypoint_tracker import KeypointTracker
 from models.PoseDetection.tracker import Track
 from models.PoseDetection.tracker import Tracker
+from models.PoseDetection.roboBreizh_Utils_pose import visualize

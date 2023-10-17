@@ -2,22 +2,45 @@
 # create ROS2 node PoseDemo
 
 from .PoseDetection.MoveNet_MultiPose.movenet_multipose import MoveNetMultiPose
+from .PoseDetection import visualize
 
-import Camera.Naoqi_camera as nc
+from .Naoqi_camera import NaoqiSingleCamera
 from Camera.naoqi_camera_types import CameraID, CameraResolution2D as res2D, CameraResolution3D as res3D, ColorSpace2D as cs2D, ColorSpace3D as cs3D
+import time
 
 from rclpy.node import Node
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
 
 import argparse
 class PoseDemo(Node):
     def __init__(self, qi_ip):
         super().__init__('PoseDemo')
+
         self.pose_model = MoveNetMultiPose(pose_model_name="movenet_multipose")
-        depth_camera_res = res3D.R320x240
-        rgb_camera_res = res2D.R320x240
     
-        cameras = nc.NaoqiCameras(ip=qi_ip, resolution = [rgb_camera_res, depth_camera_res])
-        
+        self.cam = NaoqiSingleCamera(ip=self.ip)
+        self.bridge = CvBridge()
+
+        self.pub_cv2 = self.create_publisher(Image, 'pose_detector', 10)
+    
+    def image_callback(self):
+        start = time.time()
+
+        frame = self.cam.get_image('cv2')
+        opencv_out = self.inference(frame)
+
+        end = time.time()
+        print("FPS: ", 1/(end-start))
+
+        ros_image_yolo_cv = self.bridge.cv2_to_imgmsg(opencv_out, "rgb8")
+
+        self.pub_cv2.publish(ros_image_yolo_cv)
+
+    def inference(self, rgb_image):
+        list_person = self.pose_model.inference(rgb_image)
+        return visualize(list_person)
+
 def main():
     # get arg 1 and 2
     # parser = argparse.ArgumentParser()

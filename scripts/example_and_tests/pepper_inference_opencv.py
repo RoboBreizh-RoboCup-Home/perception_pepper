@@ -7,7 +7,6 @@ from cv_bridge import CvBridge
 import rclpy
 from rclpy.node import Node
 
-from PIL import Image
 from sensor_msgs.msg import Image
 
 import cv2
