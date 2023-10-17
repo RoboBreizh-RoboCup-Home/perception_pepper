@@ -54,7 +54,7 @@ class MoveNetMultiPose(object):
         
         # Initialize the TFLite model.
         base_path = get_pkg_path()
-        path = os.path.join(base_path, "scripts/models/PoseDetection/MoveNet_MultiPose/tensorflow_lite_multipose/")
+        path = os.path.join(base_path, "perception_pepper/models/PoseDetection/MoveNet_MultiPose/tensorflow_lite_multipose/")
         interpreter = Interpreter(model_path=(path + pose_model_name), num_threads=4)
 
         self._input_details = interpreter.get_input_details()
