@@ -19,12 +19,12 @@ from typing import List
 
 import cv2
 import numpy as np
-from models.PoseDetection.roboBreizh_Data_pose import *
-from models.PoseDetection.roboBreizh_Utils_pose import *
-from perception_utils.utils import get_pkg_path
-from models.PoseDetection.config import TrackerConfig
-from models.PoseDetection.keypoint_tracker import KeypointTracker
-from models.PoseDetection.bounding_box_tracker import BoundingBoxTracker
+from perception_pepper.models.PoseDetection.roboBreizh_Data_pose import *
+from perception_pepper.models.PoseDetection.roboBreizh_Utils_pose import *
+from perception_pepper.perception_utils.utils import get_pkg_path
+from perception_pepper.models.PoseDetection.config import TrackerConfig
+from perception_pepper.models.PoseDetection.keypoint_tracker import KeypointTracker
+from perception_pepper.models.PoseDetection.bounding_box_tracker import BoundingBoxTracker
 
 # Import TFLite interpreter from tflite_runtime package if it's available.
 from tflite_runtime.interpreter import Interpreter

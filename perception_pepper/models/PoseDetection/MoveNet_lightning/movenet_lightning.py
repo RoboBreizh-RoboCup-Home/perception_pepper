@@ -22,11 +22,11 @@ import numpy as np
 import os
 import time
 
-from models.PoseDetection.roboBreizh_Data_pose import *
-from models.PoseDetection.roboBreizh_Utils_pose import *
-from perception_utils.utils import *
-from perception_utils.transform_utils import *
-from perception_utils.bcolors import bcolors
+from perception_pepper.models.PoseDetection.roboBreizh_Data_pose import *
+from perception_pepper.models.PoseDetection.roboBreizh_Utils_pose import *
+from perception_pepper.perception_utils.utils import *
+from perception_pepper.perception_utils.transform_utils import *
+from perception_pepper.perception_utils.bcolors import bcolors
 
 # Import TFLite interpreter from tflite_runtime package
 from tflite_runtime.interpreter import Interpreter
