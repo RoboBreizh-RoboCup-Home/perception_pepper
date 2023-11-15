@@ -21,7 +21,6 @@ from models.ColourDetection.ColourDetection import ColourDetection
 # import utils
 from perception_utils.bcolors import bcolors
 import perception_utils.distances_utils as distances_utils
-import perception_utils.transform_utils as tf_utils
 import time
 
 class PersonFeatureDetection(Node):
@@ -75,9 +74,6 @@ class PersonFeatureDetection(Node):
                 # Distance Detection
                 dist, point_x, point_y, point_z, _, _ = distances_utils.detectDistanceResolution(
                         ori_depth_image, clothes_start_x, clothes_end_y, clothes_start_y, clothes_end_x, resolutionRGB=[ori_rgb_image_320.shape[1], ori_rgb_image_320.shape[0]])
-                
-                odom_point = tf_utils.compute_absolute_pose([point_x,point_y,point_z])
-
                 
                 if dist <= float(distanceMax):
                     

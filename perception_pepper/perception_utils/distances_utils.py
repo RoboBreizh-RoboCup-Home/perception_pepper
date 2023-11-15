@@ -4,17 +4,8 @@
 # Created Date: 2022
 # ---------------------------------------------------------------------------
 
-
-
-
-import rospkg
 import math
 import numpy as np
-import tf2_ros
-import tf2_geometry_msgs
-from geometry_msgs.msg import Point32, PointStamped
-import rospy
-import operator
 from perception_utils.bcolors import bcolors
 
 
@@ -280,10 +271,6 @@ def detectDistanceResolution(depth_image, left, bottom, top, right, resolutionRG
             m_fy = 275.741846757374
             m_cx = 141.184472810944
             m_cy = 106.693773654172
-        
-        else:
-            
-            rospy.loginfo("Current RGB resolution not supporting distance calculation")
 
         # ----- 640 x 480 / Cam D ----
         #  cam_info_msg.K = boost::array<double, 9>{{ 525, 0, 319.5000000, 0, 525, 239.5000000000000, 0, 0, 1  }};
