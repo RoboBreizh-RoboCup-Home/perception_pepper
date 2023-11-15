@@ -1,9 +1,5 @@
-import rospkg
-import rospy
-import operator
-from perception_utils.bcolors import bcolors
+from perception_pepper.perception_utils.bcolors import bcolors
 import math
-import time
 import cv2
 
 class Chair:

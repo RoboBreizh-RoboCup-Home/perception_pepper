@@ -6,7 +6,7 @@
 
 import math
 import numpy as np
-from perception_utils.bcolors import bcolors
+from perception_pepper.perception_utils.bcolors import bcolors
 
 
 ######################################################################
