@@ -4,8 +4,8 @@ import numpy as np
 
 from PIL import Image
 
-from perception_utils.bcolors import bcolors
-from ObjectDetection.utils import Model
+from perception_pepper.perception_utils.bcolors import bcolors
+from perception_pepper.models.ObjectDetection.utils import Model
 
 class YOLOV8(Model):
     def __init__(self, model_name='ycb_320', _conf_threshold=0.3, _iou_threshold=0.5, inference_engine='opencv'):
