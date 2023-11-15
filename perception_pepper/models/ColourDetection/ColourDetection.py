@@ -2,8 +2,8 @@ import numpy as np
 import cv2
 from datetime import datetime
 import os
-from perception_utils.utils import get_pkg_path
-from perception_utils.bcolors import bcolors
+from perception_pepper.perception_utils.utils import get_pkg_path
+from perception_pepper.perception_utils.bcolors import bcolors
 import time
 
 class ColourDetection():
