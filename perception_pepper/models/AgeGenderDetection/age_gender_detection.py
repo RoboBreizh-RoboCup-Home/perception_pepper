@@ -3,10 +3,9 @@ from tflite_runtime.interpreter import Interpreter
 import numpy as np
 import cv2, os
 from time import time
-from perception_utils.utils import *
-from perception_utils.utils import get_pkg_path
-from perception_utils.bcolors import bcolors
-import rospy
+from perception_pepper.perception_utils.utils import *
+from perception_pepper.perception_utils.utils import get_pkg_path
+from perception_pepper.perception_utils.bcolors import bcolors
 import time
 
 class AgeGender():
@@ -38,7 +37,7 @@ class AgeGender():
         output_details_gender = interpreter_gender.get_output_details()
         input_shape_gender = input_details_gender[0]['shape']
         
-        rospy.loginfo(
+        print(
             bcolors.CYAN+"[RoboBreizh - Vision]        Loading Age/Gender TFlite Detection weights done."+bcolors.ENDC)
 
         return interpreter_age, input_details_age, output_details_age, input_shape_age, interpreter_gender, input_details_gender, output_details_gender, input_shape_gender
@@ -91,7 +90,7 @@ class AgeGender():
             
         time_end = time.time()
         
-        rospy.loginfo("TFlite Age & Gender Model Inference time : " + str(time_end-time_start))
+        print("TFlite Age & Gender Model Inference time : " + str(time_end-time_start))
 
         return predic_gender #predic_age, 
 

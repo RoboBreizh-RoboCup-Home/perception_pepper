@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 import time
-from perception_utils.utils import get_pkg_path
 import os
 import cv2
-from perception_utils.bcolors import bcolors
 import numpy as np
 from operator import itemgetter
+
+from perception_pepper.perception_utils.utils import get_pkg_path
+from perception_pepper.perception_utils.bcolors import bcolors
 
 class FaceDetection():
     

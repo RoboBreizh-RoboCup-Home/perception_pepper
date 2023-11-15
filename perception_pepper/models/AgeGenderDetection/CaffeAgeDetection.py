@@ -2,10 +2,9 @@
 #!/usr/bin/env python
 import os
 import cv2
-from perception_utils.utils import get_pkg_path
+from perception_pepper.perception_utils.utils import get_pkg_path
 import time
-from perception_utils.bcolors import bcolors
-import rospy
+from perception_pepper.perception_utils.bcolors import bcolors
 
 class AgePrediction():
     
@@ -46,6 +45,6 @@ class AgePrediction():
         else:
             print(
                 bcolors.WARNING+'     ObjectDetector agePrediction cropped image  EMPTY'+bcolors.ENDC)
-        rospy.loginfo("Caffee Age Model Inference time : " + str(end_time-start_time))
+        print("Caffee Age Model Inference time : " + str(end_time-start_time))
         
         return ageRange

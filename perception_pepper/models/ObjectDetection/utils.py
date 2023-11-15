@@ -1,4 +1,4 @@
-from perception_utils.utils import get_pkg_path
+from perception_pepper.perception_utils.utils import get_pkg_path
 import os
 import numpy as np
 import json
