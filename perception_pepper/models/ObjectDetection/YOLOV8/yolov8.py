@@ -2,7 +2,6 @@ import time
 import cv2
 import numpy as np
 
-import rospy
 from PIL import Image
 
 from perception_utils.bcolors import bcolors
@@ -137,7 +136,7 @@ class YOLOV8(Model):
                 import onnxruntime
                 return onnxruntime.InferenceSession(self.model_path, providers=['CPUExecutionProvider'])
             
-            rospy.loginfo(
+            print(
                 bcolors.CYAN+"[RoboBreizh - Vision]    Loading Object Detection weights done"+bcolors.ENDC)
             
         else:
@@ -153,7 +152,7 @@ class YOLOV8(Model):
             assert len(input_size) == 2, 'Invalid input size'
             return int(input_size[0])
         except:
-            rospy.loginfo(bcolors.INFO+"[RoboBreizh - YOLOV8] Input layer not detected, input size set to (320,320)"+bcolors.ENDC)
+            print(bcolors.INFO+"[RoboBreizh - YOLOV8] Input layer not detected, input size set to (320,320)"+bcolors.ENDC)
             return 320
         
     def inference(self, image):
@@ -170,7 +169,7 @@ class YOLOV8(Model):
         
         time_end = time.time()
         
-        rospy.loginfo("YOLOV8 Object Detection Inference time : " + str(time_end-time_start))
+        print("YOLOV8 Object Detection Inference time : " + str(time_end-time_start))
 
         return detections
     
