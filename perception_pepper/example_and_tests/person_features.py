@@ -6,8 +6,7 @@ from rclpy.node import Node
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
-import Camera.Naoqi_camera as nc
-from Camera.naoqi_camera_types import CameraID, CameraResolution2D as res2D, CameraResolution3D as res3D, ColorSpace2D as cs2D, ColorSpace3D as cs3D
+from perception_pepper.Camera import NaoqiCameras
 from cv_bridge import CvBridge
 import cv2
 
@@ -27,7 +26,7 @@ import time
 
 class PersonFeatureDetection(Node):
         
-    def __init__(self , yolo_model, face_model, cafffe_age_model, age_gender_model, glass_model, colour_csv, cameras: nc.NaoqiCameras, VISUAL) -> None:
+    def __init__(self , yolo_model, face_model, cafffe_age_model, age_gender_model, glass_model, colour_csv, cameras: NaoqiCameras, VISUAL) -> None:
         super().__init__('FeaturesDemo')
 
         self.VISUAL = VISUAL        
@@ -161,10 +160,7 @@ def main(args=None):
 
     # print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
     VISUAL = True
-    depth_camera_res = res3D.R320x240
-    rgb_camera_res = res2D.R640x480
-
-    cameras = nc.NaoqiCameras(ip='127.0.0.1', resolution = [rgb_camera_res, depth_camera_res])
+    cameras = NaoqiCameras(ip='127.0.0.1')
     features_detector = PersonFeatureDetection(yolo_model="clothes_320", 
                            face_model="face_detection_yunet_2022mar.onnx", 
                            cafffe_age_model= "age_net.caffemodel",
