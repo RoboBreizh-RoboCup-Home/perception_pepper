@@ -3,7 +3,6 @@
 import numpy as np
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
 from perception_pepper.Camera import NaoqiCameras
@@ -11,16 +10,16 @@ from cv_bridge import CvBridge
 import cv2
 
 # import models
-from models.ObjectDetection.YOLOV8.yolov8 import YOLOV8
-from models.FaceDetection.onnx_facedetection import FaceDetection
-from models.AgeGenderDetection.age_gender_detection import AgeGender
-from models.AgeGenderDetection.CaffeAgeDetection import AgePrediction
-from models.GlassesDetection.GlassesDetection import GlassDetection
-from models.ColourDetection.ColourDetection import ColourDetection
+from perception_pepper.models.ObjectDetection.YOLOV8.yolov8 import YOLOV8
+from perception_pepper.models.FaceDetection.onnx_facedetection import FaceDetection
+from perception_pepper.models.AgeGenderDetection.age_gender_detection import AgeGender
+from perception_pepper.models.AgeGenderDetection.CaffeAgeDetection import AgePrediction
+from perception_pepper.models.GlassesDetection.GlassesDetection import GlassDetection
+from perception_pepper.models.ColourDetection.ColourDetection import ColourDetection
 
 # import utils
-from perception_utils.bcolors import bcolors
-import perception_utils.distances_utils as distances_utils
+from perception_pepper.perception_utils.bcolors import bcolors
+import perception_pepper.perception_utils.distances_utils as distances_utils
 import time
 
 class PersonFeatureDetection(Node):
