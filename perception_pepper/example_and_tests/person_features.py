@@ -10,7 +10,7 @@ from cv_bridge import CvBridge
 import cv2
 
 # import models
-from perception_pepper.models.ObjectDetection.YOLOV8.yolov8 import YOLOV8
+from perception_pepper.models.ObjectDetection.YOLOV8 import YOLOV8
 from perception_pepper.models.FaceDetection.onnx_facedetection import FaceDetection
 from perception_pepper.models.AgeGenderDetection.age_gender_detection import AgeGender
 from perception_pepper.models.AgeGenderDetection.CaffeAgeDetection import AgePrediction

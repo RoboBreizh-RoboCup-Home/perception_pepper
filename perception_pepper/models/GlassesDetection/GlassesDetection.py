@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import time
 import cv2
-import rospy
 import numpy as np
 import dlib
 import numpy as np
@@ -24,10 +23,7 @@ class GlassDetection():
         glasses_model_path = os.path.join(get_pkg_path(), ('scripts/models/GlassesDetection/' + glass_model_name))
         glasses_predictor = dlib.shape_predictor(glasses_model_path)
         self.glasses_detector = dlib.get_frontal_face_detector()
-        
-        rospy.loginfo(
-            bcolors.CYAN+"[RoboBreizh - Vision]        Loading Glasses Detection weights done."+bcolors.ENDC)
-
+     
         return glasses_predictor
 
     def landmarks_to_np(self, landmarks, dtype="int"):
@@ -171,6 +167,6 @@ class GlassDetection():
             #     cv2.putText(rgb_image, "No Glasses", (x_face + 100, y_face - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2, cv2.LINE_AA)
         
         time_end = time.time()
-        rospy.loginfo("Glasses Model Inference time : " + str(time_end - time_start))
+        print("Glasses Model Inference time : " + str(time_end - time_start))
 
         return judge

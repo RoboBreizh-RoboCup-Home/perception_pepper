@@ -5,7 +5,6 @@ import os
 from perception_utils.utils import get_pkg_path
 from perception_utils.bcolors import bcolors
 import time
-import rospy
 
 class ColourDetection():
     
@@ -17,7 +16,7 @@ class ColourDetection():
         self.contrast = 5
         self.crop_factor = 60
         self.color_type = color_type
-        rospy.loginfo(
+        print(
                 bcolors.CYAN+"[RoboBreizh - Vision]    Loading Colour Detection type --" + self.color_type +  "-- done"+bcolors.ENDC)
 
     def change_brightness(self,img, brightness_value):
@@ -89,7 +88,6 @@ class ColourDetection():
         # Get the smallest distance
         index_of_smallest = np.where(distances==np.amin(distances))
         
-        rospy.loginfo("Closest colour index from CSV" + str(index_of_smallest))
         return csv[int(index_of_smallest[0][0])][1]
     
     def sort_color_by_percentage(self,colors, percentages):
@@ -121,7 +119,7 @@ class ColourDetection():
         
         time_end = time.time()
         
-        rospy.loginfo("Colour Detection Inference time : " + str(time_end-time_start))
+        print("Colour Detection Inference time : " + str(time_end-time_start))
 
         return ok, color_res, None, mapping
 

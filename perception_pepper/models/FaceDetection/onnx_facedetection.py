@@ -4,7 +4,6 @@ import time
 from perception_utils.utils import get_pkg_path
 import os
 import cv2
-import rospy
 from perception_utils.bcolors import bcolors
 import numpy as np
 from operator import itemgetter
@@ -38,9 +37,6 @@ class FaceDetection():
         backend_id=self.backend,
         target_id=self.target
         )
-        
-        rospy.loginfo(
-            bcolors.CYAN+"[RoboBreizh - Vision]        Loading Face Detection weights done."+bcolors.ENDC)
         
         return face_detector
     
