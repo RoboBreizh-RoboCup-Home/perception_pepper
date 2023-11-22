@@ -155,6 +155,7 @@ def main(args=None):
 
     # print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
     VISUAL = True
+
     cameras = NaoqiCameras(ip='127.0.0.1')
     features_detector = PersonFeatureDetection(yolo_model="clothes_320", 
                            face_model="face_detection_yunet_2022mar.onnx", 

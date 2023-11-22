@@ -29,9 +29,11 @@ class PoseDemo(Node):
         start = time.time()
 
         frame = self.cam.get_image('cv2')
+        inf_time = time.time()
         opencv_out = self.inference(frame)
 
         end = time.time()
+        print("Inference only time: ", inf_time-start)
         print("FPS: ", 1/(end-start))
 
         ros_image_yolo_cv = self.bridge.cv2_to_imgmsg(opencv_out, "rgb8")

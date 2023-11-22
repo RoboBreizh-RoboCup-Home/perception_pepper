@@ -16,7 +16,7 @@ from perception_pepper.Camera.naoqi_camera_types import CameraID, CameraResoluti
 
 class NaoqiCamera():
     # default cam top RGB at 30 fps on localhost
-    def __init__(self, resolution: Union[res2D, res3D] = res2D.R640x480, camera_id: CameraID = CameraID.TOP, fps: int = 30, color_space: Union[cs2D, cs3D] = cs2D.RGBColorSpace):
+    def __init__(self, resolution: Union[res2D, res3D] = [res2D.R640x480,res3D.R320x240], camera_id: CameraID = CameraID.TOP, fps: int = 30, color_space: Union[cs2D, cs3D] = cs2D.RGBColorSpace):
 
         self.session = None
         self.video_service = None
