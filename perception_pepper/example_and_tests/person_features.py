@@ -59,7 +59,7 @@ class PersonFeatureDetection(Node):
         else:
             ori_rgb_image_320 = ori_rgb_image
             
-        ori_rgb_image_320 = self.colour_detector.apply_brightness_contrast(ori_rgb_image_320)
+        # ori_rgb_image_320 = self.colour_detector.apply_brightness_contrast(ori_rgb_image_320)
         
         # Clothes Detection
         detections = self.yolo_clothes_detector.inference(ori_rgb_image_320)
@@ -124,7 +124,8 @@ class PersonFeatureDetection(Node):
                   
         else:
             self.get_logger().info(
-                bcolors.R+"[RoboBreizh - Vision]    Clothes/Person not Detected"+bcolors.ENDC)              
+                bcolors.R+"[RoboBreizh - Vision]    Clothes/Person not Detected"+bcolors.ENDC)    
+            image_age_gender = ori_rgb_image_320.copy()          
                 
         time_end = time.time()
 

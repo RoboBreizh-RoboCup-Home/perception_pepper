@@ -10,9 +10,9 @@ class SSDMobileNetV2():
     def __init__(self, _conf_threshold):
         
         self.basepath = get_pkg_path()
-        self.model_path = "scripts/models/ObjectDetection/SSDMobileNetv2_OIDv4/frozen_inference_graph.pb"
-        self.config_file = "scripts/models/ObjectDetection/SSDMobileNetv2_OIDv4/graph.pbtxt"
-        self.classes_txt = 'scripts/models/ObjectDetection/SSDMobileNetv2_OIDv4/objects.names.en'
+        self.model_path = "models/ObjectDetection/SSDMobileNetv2_OIDv4/frozen_inference_graph.pb"
+        self.config_file = "models/ObjectDetection/SSDMobileNetv2_OIDv4/graph.pbtxt"
+        self.classes_txt = 'models/ObjectDetection/SSDMobileNetv2_OIDv4/objects.names.en'
         self._conf_threshold = _conf_threshold
         self.oid_classes = os.path.join(self.basepath, self.classes_txt)
         self.frozen_model_oid = os.path.join(self.basepath, self.model_path)

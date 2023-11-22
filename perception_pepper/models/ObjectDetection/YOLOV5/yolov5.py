@@ -25,14 +25,14 @@ class YOLOV5(Model):
     def get_model(self, dataset_name):
         self.path_catalog = {'ycb_320': {
             'type': 'onnx',
-            'model_path':  os.path.join(self.base_path, 'scripts/models/ObjectDetection/YOLOV8/weights/YCB/yolov8n_320.onnx'),
-            'classes': os.path.join(self.base_path, 'scripts/models/ObjectDetection/YOLOV8/weights/YCB/objects.txt'),
+            'model_path':  os.path.join(self.base_path, 'models/ObjectDetection/YOLOV8/weights/YCB/yolov8n_320.onnx'),
+            'classes': os.path.join(self.base_path, 'models/ObjectDetection/YOLOV8/weights/YCB/objects.txt'),
             'input_size': 320,
             },
             'ycb_640': {
             'type': 'onnx',
-            'model_path':  os.path.join(self.base_path, 'scripts/models/ObjectDetection/YOLOV8/weights/YCB/yolov8n_640.onnx'),
-            'classes': os.path.join(self.base_path, 'scripts/models/ObjectDetection/YOLOV8/weights/YCB/objects.txt'),
+            'model_path':  os.path.join(self.base_path, 'models/ObjectDetection/YOLOV8/weights/YCB/yolov8n_640.onnx'),
+            'classes': os.path.join(self.base_path, 'models/ObjectDetection/YOLOV8/weights/YCB/objects.txt'),
             'input_size': 640,
             },
         }
