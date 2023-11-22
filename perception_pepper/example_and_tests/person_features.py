@@ -116,7 +116,7 @@ class PersonFeatureDetection(Node):
                         cv2.rectangle(image_age_gender, (int(face_start_x), int(face_start_y)) , (int(face_end_x), int(face_end_y)), (0,0,255), 2)
                         # display age and gender above face
                         age =  gender + ' ' + age_caffee
-                        cv2.addText(image_age_gender, str(age), (int(face_start_x), int(face_start_y-20)), "Arial", (0,0,255), 20)                      
+                        cv2.addText(image_age_gender, str(age), (int(face_start_x), int(face_start_y-20)), "Arial", 20, (0,0,255))                      
                         
                 else:
                     self.get_logger().info(
