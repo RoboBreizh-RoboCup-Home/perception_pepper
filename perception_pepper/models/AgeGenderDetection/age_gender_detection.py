@@ -13,7 +13,7 @@ class AgeGender():
         self.string_pred_age = ['20 - 27', '20 - 27','20 - 27','20 - 27','20 - 27','28 - 35','36 - 45','46 - 60','61 - 75']
         self.string_pred_gen = ['F', 'M']
         base_path = get_pkg_path()
-        self.age_gender_model_path = os.path.join(base_path, "scripts/models/AgeGenderDetection/" + age_gender_model)
+        self.age_gender_model_path = os.path.join(base_path, "models/AgeGenderDetection/" + age_gender_model)
         
     def get_model(self, age_gender_model_path):
 

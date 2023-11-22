@@ -22,7 +22,7 @@ class FaceDetection():
         
     def get_model(self, face_model_name):
         
-        face_model_path = os.path.join(get_pkg_path(), ("scripts/models/FaceDetection/" + face_model_name))
+        face_model_path = os.path.join(get_pkg_path(), ("models/FaceDetection/" + face_model_name))
 
         return face_model_path
     

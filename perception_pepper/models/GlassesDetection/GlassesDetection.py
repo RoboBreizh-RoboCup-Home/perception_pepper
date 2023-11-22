@@ -20,7 +20,7 @@ class GlassDetection():
         
     def get_model(self, glass_model_name):
         
-        glasses_model_path = os.path.join(get_pkg_path(), ('scripts/models/GlassesDetection/' + glass_model_name))
+        glasses_model_path = os.path.join(get_pkg_path(), ('models/GlassesDetection/' + glass_model_name))
         glasses_predictor = dlib.shape_predictor(glasses_model_path)
         self.glasses_detector = dlib.get_frontal_face_detector()
      

@@ -18,8 +18,8 @@ class AgePrediction():
         # Age Detection model
         age_detector = cv2.dnn.readNetFromCaffe(
                 os.path.join(
-                    get_pkg_path(), "scripts/models/AgeGenderDetection/age/deploy_age.prototxt"),
-                os.path.join(get_pkg_path(), ("scripts/models/AgeGenderDetection/age/" + age_model_name))
+                    get_pkg_path(), "models/AgeGenderDetection/age/deploy_age.prototxt"),
+                os.path.join(get_pkg_path(), ("models/AgeGenderDetection/age/" + age_model_name))
             ) 
         
         return age_detector    

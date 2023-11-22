@@ -11,7 +11,7 @@ class ColourDetection():
     def __init__(self, colour_csv_file_name="new_colorsV3.csv", color_type="rgb"):
         
         self.pkg_path = get_pkg_path()
-        self.newest_csv_path = os.path.join(self.pkg_path, ('scripts/models/ColourDetection/color_csv/' + colour_csv_file_name))
+        self.newest_csv_path = os.path.join(self.pkg_path, ('models/ColourDetection/color_csv/' + colour_csv_file_name))
         self.brightness_value = 5
         self.contrast = 5
         self.crop_factor = 60

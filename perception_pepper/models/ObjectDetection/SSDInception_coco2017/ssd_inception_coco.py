@@ -10,9 +10,9 @@ class SSDInception():
     def __init__(self, _conf_threshold):
         
         self.basepath = get_pkg_path()
-        self.model_path = "scripts/models/ObjectDetection/SSDInception_coco2017/frozen_inference_graph.pb"
-        self.config_file = "scripts/models/ObjectDetection/SSDInception_coco2017/ssd_inception_v2_coco_2017_11_17.pbtxt"
-        self.classes_txt = 'scripts/models/ObjectDetection/SSDInception_coco2017/objects.txt'
+        self.model_path = "models/ObjectDetection/SSDInception_coco2017/frozen_inference_graph.pb"
+        self.config_file = "models/ObjectDetection/SSDInception_coco2017/ssd_inception_v2_coco_2017_11_17.pbtxt"
+        self.classes_txt = 'models/ObjectDetection/SSDInception_coco2017/objects.txt'
         self._conf_threshold = _conf_threshold
         self.coco_classes = os.path.join(self.basepath, self.classes_txt)
         self.frozen_model_coco = os.path.join(self.basepath, self.model_path)
