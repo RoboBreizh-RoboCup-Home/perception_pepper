@@ -29,7 +29,7 @@ class NaoqiCamera():
             raise f'The camera {camera_id} does not support resolution {resolution}'
 
         # make sure resolution and camera id match
-        assert isinstance(resolution, res2D) and camera_id != CameraID.DEPTH or isinstance(resolution, res3D) and camera_id != CameraID.DEPTH, f'The resolution {resolution} and camera {camera_id} are not compatible'
+        assert isinstance(resolution, res2D) and camera_id != CameraID.DEPTH or isinstance(resolution, res3D) and camera_id == CameraID.DEPTH, f'The resolution {resolution} and camera {camera_id} are not compatible'
         self.camera = camera_id
         # make sure if resolution is type res2D then colorspace is cs2D
         # or is type res3D then colorspace is cs3D
