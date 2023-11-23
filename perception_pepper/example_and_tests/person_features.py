@@ -44,7 +44,19 @@ class PersonFeatureDetection(Node):
             self.pub_cv =  self.create_publisher(Image, '/roboBreizh_detector/person_feature_detection_image', 10)
             self.pub_compressed_img = self.create_publisher(CompressedImage, "/roboBreizh_detector/person_feature_compressed_image", 10)
             self.pub_compressed_img_age = self.create_publisher(CompressedImage, "/roboBreizh_detector/person_feature_compressed_image_age", 10)
-             
+    
+    def draw_bbox(self, image, bbox, label, color=(255, 0, 0), thickness=2):
+        """Draws single bounding box on the image"""
+        x1, y1, x2, y2 = bbox
+        image = cv2.rectangle(image, (int(x1), int(y1)) , (int(x2), int(y2)), color, thickness)
+        # display cloth name in black text
+        text_color = (255, 255, 255)
+        (w, h), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)
+        # Prints the text.
+        image = cv2.rectangle(image, (x1, y1 - 20), (x1 + w, y1), color, -1)
+        image = cv2.putText(image, label, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, text_color, 1)
+        return image
+        
     def image_callback(self):
 
         # entries list of maximum distance for person detection
@@ -108,17 +120,12 @@ class PersonFeatureDetection(Node):
                         ok, skin_color,_, mapping = self.colour_detector.inference(cropped_face_image, 'skin')
 
                     if self.VISUAL:
-                        image_age_gender = ori_rgb_image_320.copy()
                         # Display clothes in red rectangle
-                        cv2.rectangle(ori_rgb_image_320, (int(clothes_start_x), int(clothes_start_y)) , (int(clothes_end_x), int(clothes_end_y)), (255,0,0), 2)
-                        # display cloth name in black text
-                        cv2.putText(ori_rgb_image_320, str(clothes_style+', '+clothes_color), (int(clothes_start_x), int(clothes_start_y-20)), cv2.FONT_HERSHEY_SIMPLEX, 10, (0,0,0))
+                        image_clothes = self.draw_bbox(ori_rgb_image_320, [clothes_start_x, clothes_start_y, clothes_end_x, clothes_end_y], clothes_color+' '+clothes_style, color=(0, 0, 255), thickness=2)
+
                         # Display face
-                        # cv2.rectangle(ori_rgb_image_320, (int(face_start_x), int(face_start_y)) , (int(face_end_x), int(face_end_y)), (0,0,255), 2)
-                        cv2.rectangle(image_age_gender, (int(face_start_x), int(face_start_y)) , (int(face_end_x), int(face_end_y)), (0,0,255), 2)
-                        # display age and gender above face
-                        age =  gender + ' ' + age_caffee
-                        cv2.putText(image_age_gender, str(age), (int(face_start_x), int(face_start_y-20)), cv2.FONT_HERSHEY_SIMPLEX, 10, (0,0,0))                      
+                        age_label =  gender + ' ' + age_caffee
+                        image_age_gender = self.draw_bbox(ori_rgb_image_320, [face_start_x, face_start_y, face_end_x, face_end_y], age_label, color=(255, 0, 0), thickness=2)                   
                         
                 else:
                     self.get_logger().info(
@@ -134,7 +141,7 @@ class PersonFeatureDetection(Node):
         self.get_logger().info("Total time inference: " + str(time_end-time_start))
         
         if self.VISUAL:
-            self.visualiseRVIZ(ori_rgb_image_320, image_age_gender)
+            self.visualiseRVIZ(image_clothes, image_age_gender)
  
     def visualiseRVIZ(self, image, image2):
         
