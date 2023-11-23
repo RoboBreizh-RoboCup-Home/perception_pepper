@@ -141,7 +141,7 @@ class PersonFeatureDetection(Node):
         if self.VISUAL:
             self.visualiseRVIZ(image_age_gender)
  
-    def visualiseRVIZ(self, image, image2):
+    def visualiseRVIZ(self, image):
         
         ros_image = self.bridge.cv2_to_imgmsg(image, "bgr8")
         self.pub_cv.publish(ros_image)
