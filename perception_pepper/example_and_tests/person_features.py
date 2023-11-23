@@ -42,8 +42,6 @@ class PersonFeatureDetection(Node):
         if self.VISUAL: 
             self.bridge = CvBridge()
             self.pub_cv =  self.create_publisher(Image, '/roboBreizh_detector/person_feature_detection_image', 10)
-            self.pub_compressed_img = self.create_publisher(CompressedImage, "/roboBreizh_detector/person_feature_compressed_image", 10)
-            self.pub_compressed_img_age = self.create_publisher(CompressedImage, "/roboBreizh_detector/person_feature_compressed_image_age", 10)
     
     def draw_bbox(self, image, bbox, label, color=(255, 0, 0), thickness=2):
         """Draws single bounding box on the image"""
@@ -125,7 +123,7 @@ class PersonFeatureDetection(Node):
 
                         # Display face
                         age_label =  gender + ' ' + age_caffee
-                        image_age_gender = self.draw_bbox(ori_rgb_image_320, [face_start_x, face_start_y, face_end_x, face_end_y], age_label, color=(255, 0, 0), thickness=2)                   
+                        image_age_gender = self.draw_bbox(image_clothes, [face_start_x, face_start_y, face_end_x, face_end_y], age_label, color=(255, 0, 0), thickness=2)                   
                         
                 else:
                     self.get_logger().info(
@@ -135,30 +133,18 @@ class PersonFeatureDetection(Node):
             self.get_logger().info(
                 bcolors.R+"[RoboBreizh - Vision]    Clothes/Person not Detected"+bcolors.ENDC)    
             image_age_gender = ori_rgb_image_320.copy()
-            image_clothes = ori_rgb_image_320.copy()  
                 
         time_end = time.time()
 
         self.get_logger().info("Total time inference: " + str(time_end-time_start))
         
         if self.VISUAL:
-            self.visualiseRVIZ(image_clothes, image_age_gender)
+            self.visualiseRVIZ(image_age_gender)
  
     def visualiseRVIZ(self, image, image2):
         
         ros_image = self.bridge.cv2_to_imgmsg(image, "bgr8")
-        self.pub_cv.publish(ros_image) 
-        
-        #### Create CompressedIamge ####
-        msg = CompressedImage()
-        msg.format = "jpeg"
-        msg.data = np.array(cv2.imencode('.jpg', image)[1]).tostring()
-        # Publish new image
-        self.pub_compressed_img.publish(msg)
-        msg2 = CompressedImage()
-        msg2.format = "jpeg"
-        msg2.data = np.array(cv2.imencode('.jpg', image2)[1]).tostring()
-        self.pub_compressed_img_age.publish(msg2)
+        self.pub_cv.publish(ros_image)
 
 
 def main(args=None):
