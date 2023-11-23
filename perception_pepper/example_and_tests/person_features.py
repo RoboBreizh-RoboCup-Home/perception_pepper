@@ -134,7 +134,8 @@ class PersonFeatureDetection(Node):
         else:
             self.get_logger().info(
                 bcolors.R+"[RoboBreizh - Vision]    Clothes/Person not Detected"+bcolors.ENDC)    
-            image_age_gender = ori_rgb_image_320.copy()          
+            image_age_gender = ori_rgb_image_320.copy()
+            image_clothes = ori_rgb_image_320.copy()  
                 
         time_end = time.time()
 
