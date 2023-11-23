@@ -29,6 +29,8 @@ class PoseDemo(Node):
         start = time.time()
 
         frame = self.cam.get_image('cv2')
+        print("Get frame time: ", time.time()-start)
+        
         inf_time = time.time()
         opencv_out = self.inference(frame)
 
