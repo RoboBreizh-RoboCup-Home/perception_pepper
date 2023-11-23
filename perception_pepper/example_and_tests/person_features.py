@@ -109,16 +109,16 @@ class PersonFeatureDetection(Node):
 
                     if self.VISUAL:
                         image_age_gender = ori_rgb_image_320.copy()
-                        # Display clothes
+                        # Display clothes in red rectangle
                         cv2.rectangle(ori_rgb_image_320, (int(clothes_start_x), int(clothes_start_y)) , (int(clothes_end_x), int(clothes_end_y)), (255,0,0), 2)
-                        # display cloth name
-                        cv2.putText(ori_rgb_image_320, str(clothes_style+', '+clothes_color), (int(clothes_start_x), int(clothes_start_y-20)), "Arial", 20, (255,0,0))
+                        # display cloth name in black text
+                        cv2.putText(ori_rgb_image_320, str(clothes_style+', '+clothes_color), (int(clothes_start_x), int(clothes_start_y-20)), cv2.FONT_HERSHEY_SIMPLEX, 10, (0,0,0))
                         # Display face
                         # cv2.rectangle(ori_rgb_image_320, (int(face_start_x), int(face_start_y)) , (int(face_end_x), int(face_end_y)), (0,0,255), 2)
                         cv2.rectangle(image_age_gender, (int(face_start_x), int(face_start_y)) , (int(face_end_x), int(face_end_y)), (0,0,255), 2)
                         # display age and gender above face
                         age =  gender + ' ' + age_caffee
-                        cv2.putText(image_age_gender, str(age), (int(face_start_x), int(face_start_y-20)), "Arial", 20, (0,0,255))                      
+                        cv2.putText(image_age_gender, str(age), (int(face_start_x), int(face_start_y-20)), cv2.FONT_HERSHEY_SIMPLEX, 10, (0,0,0))                      
                         
                 else:
                     self.get_logger().info(
