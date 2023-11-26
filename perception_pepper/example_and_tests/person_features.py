@@ -141,19 +141,20 @@ def main(args=None):
     # print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
     VISUAL = True
 
-    features_detector = PersonFeatureDetection(yolo_model="clothes_320", 
+    features_detector_node = PersonFeatureDetection(yolo_model="clothes_320", 
                            face_model="face_detection_yunet_2022mar.onnx", 
                            cafffe_age_model= "age_net.caffemodel",
                            age_gender_model = "AgeGenderTFlite", 
                            glass_model = "shape_predictor_5_face_landmarks.dat", 
                            colour_csv = "new_colorsV3.csv",
                            VISUAL=VISUAL)
-    while rclpy.ok():
-    # Your code here
+    try:
+        rclpy.spin(features_detector_node)
+    except KeyboardInterrupt:
         pass
-    # Clean up when finished
-    features_detector.destroy_node()
-    rclpy.shutdown()
+    finally:
+        features_detector_node.destroy_node()
+        rclpy.shutdown()
     
 if __name__ == "__main__":
     main()

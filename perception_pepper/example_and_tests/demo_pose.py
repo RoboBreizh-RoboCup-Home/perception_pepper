@@ -12,10 +12,8 @@ from cv_bridge import CvBridge
 
 import argparse
 class PoseDemo(Node):
-    def __init__(self, qi_ip):
+    def __init__(self):
         super().__init__('PoseDemo')
-
-        self.ip = qi_ip
 
         self.pose_model = MoveNetMultiPose(pose_model_name="movenet_multipose")
     
@@ -61,14 +59,15 @@ def main():
     rclpy.init()
 
     # print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
-    pose_detector = PoseDemo('127.0.0.1')
+    pose_detector_node = PoseDemo()
 
-    while rclpy.ok():
-    # Your code here
+    try:
+        rclpy.spin(pose_detector_node)
+    except KeyboardInterrupt:
         pass
-    # Clean up when finished
-    pose_detector.destroy_node()
-    rclpy.shutdown()
+    finally:
+        pose_detector_node.destroy_node()
+        rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
