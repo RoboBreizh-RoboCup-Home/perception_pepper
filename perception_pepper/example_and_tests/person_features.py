@@ -153,7 +153,7 @@ def main(args=None):
                            cameras=cameras, VISUAL=VISUAL)
     while rclpy.ok():
     # Your code here
-        features_detector.image_callback()
+        pass
     # Clean up when finished
     features_detector.destroy_node()
     rclpy.shutdown()
