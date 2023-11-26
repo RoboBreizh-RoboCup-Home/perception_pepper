@@ -24,18 +24,17 @@ class PoseDemo(Node):
         self.bridge = CvBridge()
 
         self.pub_cv2 = self.create_publisher(Image, 'pose_detector', 10)
+        self.subscriber = self.create_subscription(Image, '/image_raw', self.image_callback, 10)
     
-    def image_callback(self):
+    def image_callback(self, data):
+        frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
+
         start = time.time()
 
-        frame = self.cam.get_image('cv2')
-        print("Get frame time: ", time.time()-start)
-
-        inf_time = time.time()
         opencv_out = self.inference(frame)
 
         end = time.time()
-        print("Inference only time: ", end-inf_time)
+        print("Inference only time: ", end-start)
         print("FPS: ", 1/(end-start))
 
         ros_image_yolo_cv = self.bridge.cv2_to_imgmsg(opencv_out, "rgb8")
@@ -68,7 +67,7 @@ def main():
 
     while rclpy.ok():
     # Your code here
-        pose_detector.image_callback()
+        pass
     # Clean up when finished
     pose_detector.destroy_node()
     rclpy.shutdown()
