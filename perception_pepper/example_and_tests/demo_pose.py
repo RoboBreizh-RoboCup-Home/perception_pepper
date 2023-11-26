@@ -20,7 +20,7 @@ class PoseDemo(Node):
         self.bridge = CvBridge()
 
         self.pub_cv2 = self.create_publisher(Image, 'pose_detector', 10)
-        self.subscriber = self.create_subscription(Image, '/image_raw', self.image_callback, 10)
+        self.subscriber = self.create_subscription(Image, '/image_raw', self.image_callback, 1)
     
     def image_callback(self, data):
         frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
