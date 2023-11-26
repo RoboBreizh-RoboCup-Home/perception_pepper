@@ -4,7 +4,6 @@
 from perception_pepper.models.PoseDetection import MoveNetMultiPose
 from perception_pepper.models.PoseDetection import visualize
 
-from perception_pepper.Camera import NaoqiSingleCamera
 import time
 import rclpy
 from rclpy.node import Node
@@ -20,7 +19,6 @@ class PoseDemo(Node):
 
         self.pose_model = MoveNetMultiPose(pose_model_name="movenet_multipose")
     
-        self.cam = NaoqiSingleCamera(ip=self.ip)
         self.bridge = CvBridge()
 
         self.pub_cv2 = self.create_publisher(Image, 'pose_detector', 10)

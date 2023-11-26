@@ -5,7 +5,6 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
-from perception_pepper.Camera import NaoqiCameras
 from cv_bridge import CvBridge
 import cv2
 
@@ -24,11 +23,10 @@ import time
 
 class PersonFeatureDetection(Node):
         
-    def __init__(self , yolo_model, face_model, cafffe_age_model, age_gender_model, glass_model, colour_csv, cameras: NaoqiCameras, VISUAL) -> None:
+    def __init__(self , yolo_model, face_model, cafffe_age_model, age_gender_model, glass_model, colour_csv, VISUAL) -> None:
         super().__init__('FeaturesDemo')
 
         self.VISUAL = VISUAL        
-        self._cameras = cameras
         self.conf_threshold = 0.5
         self.nms_threshold = 0.5
     
@@ -143,14 +141,13 @@ def main(args=None):
     # print("Starting detection with args: \n model: ", model, "\n resolution: ", res, "\n")
     VISUAL = True
 
-    cameras = NaoqiCameras(ip='127.0.0.1')
     features_detector = PersonFeatureDetection(yolo_model="clothes_320", 
                            face_model="face_detection_yunet_2022mar.onnx", 
                            cafffe_age_model= "age_net.caffemodel",
                            age_gender_model = "AgeGenderTFlite", 
                            glass_model = "shape_predictor_5_face_landmarks.dat", 
-                           colour_csv = "new_colorsV3.csv", 
-                           cameras=cameras, VISUAL=VISUAL)
+                           colour_csv = "new_colorsV3.csv",
+                           VISUAL=VISUAL)
     while rclpy.ok():
     # Your code here
         pass
