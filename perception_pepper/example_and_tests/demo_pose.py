@@ -19,7 +19,9 @@ class PoseDemo(Node):
     
         self.bridge = CvBridge()
 
-        self.pub_cv2 = self.create_publisher(Image, 'pose_detector', 10)
+        self.pub_cv2 = self.create_publisher(Image, 'pose_detector', 1)
+        timer_period = 0.5  # seconds
+        self.timer = self.create_timer(timer_period, self.timer_callback)
         self.subscriber = self.create_subscription(Image, '/image_raw', self.image_callback, 1)
     
     def image_callback(self, data):
