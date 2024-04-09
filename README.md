@@ -40,6 +40,19 @@ ros2 run perception_pepper pose_demo
 ros2 run perception_pepper features_demo
 ```
 
+### Few-Shot Object Detection for the RoboCup@Home 2023
+
+During the RoboCup@Home 2023 in Bordeaux, we setup a few-shot object detection pipeline which consists of quick annotations using Roboflow, data augmentation and finally training a YOLOV8-nano model using [the ultralytics implementation](https://github.com/ultralytics/ultralytics). You can find a report of metrics and analytics about the model obtained [in our Wandb report](https://api.wandb.ai/links/maelic/1min9pvk). The dataset is available at [https://app.roboflow.com/robobreizh/robocup-home-2023](https://app.roboflow.com/robobreizh/robocup-home-2023).
+
+Here is an overview of the performance of the model:
+
+<p float="left" align="center">
+    <img width="800" src="imgs/val_batch0_pred.jpg" />  
+</p>
+
+We also tested different inference engines for fast onboard detection, here are the results, taken from [our dedicated paper](https://link.springer.com/chapter/10.1007/978-3-031-55015-7_31):
+
+![alt text](./imgs/results.png)
 
 ## Citations
 
